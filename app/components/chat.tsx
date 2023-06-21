@@ -403,6 +403,7 @@ export function ChatActions(props: {
               }
             }
             setContent(initialMessage + " " + transcript);
+            chatStore.onUserInput(initialMessage);
           };
           speechRecognition.start();
         } else {
