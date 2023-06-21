@@ -8,7 +8,10 @@ import {
 } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
-import { speechRecognition } from "../speech-recognition-types";
+import {
+  speechRecognition,
+  setSpeechRecognition,
+} from "../speech-recognition-types";
 
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
@@ -384,6 +387,7 @@ export function ChatActions(props: {
     try {
       if (!recording) {
         setRecording(true);
+        setSpeechRecognition();
         if (speechRecognition) {
           const initialMessage = content;
 
