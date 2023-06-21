@@ -1,5 +1,14 @@
 import { useDebouncedCallback } from "use-debounce";
-import { useState, useRef, useEffect, useLayoutEffect } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+} from "react";
+import toast, { Toaster } from "react-hot-toast";
+
+import { speechRecognition } from "../speech-recognition-types";
 
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
@@ -15,6 +24,7 @@ import MinIcon from "../icons/min.svg";
 import ResetIcon from "../icons/reload.svg";
 import BreakIcon from "../icons/break.svg";
 import SettingsIcon from "../icons/chat-settings.svg";
+import MicrophoneIcon from "../icons/microphone.svg";
 
 import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
@@ -52,7 +62,7 @@ import { IconButton } from "./button";
 import styles from "./home.module.scss";
 import chatStyle from "./chat.module.scss";
 
-import { ListItem, Modal } from "./ui-lib";
+import { ListItem, Modal, Toast } from "./ui-lib";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LAST_INPUT_KEY, Path, REQUEST_TIMEOUT_MS } from "../constant";
 import { Avatar } from "./emoji";
@@ -327,8 +337,87 @@ export function ChatActions(props: {
   const couldStop = ChatControllerPool.hasPending();
   const stopAll = () => ChatControllerPool.stopAll();
 
+  const [recording, setRecording] = useState(false);
+  const [speechError, setSpeechError] = useState<string | null>(null);
+  const [content, setContent] = useState<string>("");
+
+  const onSpeechError = useCallback((e: any) => {
+    setSpeechError(e.message);
+    try {
+      speechRecognition?.stop();
+    } catch (e) {}
+    setRecording(false);
+  }, []);
+  const onSpeechStart = useCallback(async () => {
+    let granted = false;
+    let denied = false;
+
+    try {
+      const result = await navigator.permissions.query({
+        name: "microphone" as any,
+      });
+      if (result.state == "granted") {
+        granted = true;
+      } else if (result.state == "denied") {
+        denied = true;
+      }
+    } catch (e) {}
+
+    if (!granted && !denied) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: false,
+          audio: true,
+        });
+        stream.getTracks().forEach((track) => track.stop());
+        granted = true;
+      } catch (e) {
+        denied = true;
+      }
+    }
+
+    if (denied) {
+      onSpeechError(new Error("speech permission was not granted"));
+      return;
+    }
+
+    try {
+      if (!recording) {
+        setRecording(true);
+        if (speechRecognition) {
+          const initialMessage = content;
+
+          speechRecognition.continuous = true;
+          speechRecognition.interimResults = true;
+
+          speechRecognition.onresult = (event) => {
+            let transcript = "";
+            console.log("Transcript", event.results);
+            for (let i = 0; i < event.results.length; i++) {
+              if (event.results[i].isFinal && event.results[i][0].confidence) {
+                transcript += event.results[i][0].transcript;
+              }
+            }
+            setContent(initialMessage + " " + transcript);
+          };
+          speechRecognition.start();
+        } else {
+          onSpeechError(new Error("not supported"));
+        }
+      }
+    } catch (e) {
+      onSpeechError(e);
+    }
+  }, [recording, content, onSpeechError]);
+
+  useEffect(() => {
+    console.log("effect, speech error", speechError);
+    if (speechError) toast(speechError);
+  }, [speechError]);
+
   return (
     <div className={chatStyle["chat-input-actions"]}>
+      <Toaster />
       {couldStop && (
         <div
           className={`${chatStyle["chat-input-action"]} clickable`}
@@ -397,6 +486,13 @@ export function ChatActions(props: {
         }}
       >
         <BreakIcon />
+      </div>
+
+      <div
+        className={`${chatStyle["chat-input-action"]} clickable`}
+        onClick={onSpeechStart}
+      >
+        <MicrophoneIcon />
       </div>
     </div>
   );
