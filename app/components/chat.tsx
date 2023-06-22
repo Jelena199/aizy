@@ -390,10 +390,8 @@ export function ChatActions(props: {
         setSpeechRecognition();
         if (speechRecognition) {
           const initialMessage = content;
-
           speechRecognition.continuous = true;
           speechRecognition.interimResults = true;
-
           speechRecognition.onresult = (event) => {
             let transcript = "";
             console.log("Transcript", event.results);
@@ -403,12 +401,16 @@ export function ChatActions(props: {
               }
             }
             setContent(initialMessage + " " + transcript);
+          };
+          speechRecognition.onend = (event) => {
             chatStore.onUserInput(content);
           };
           speechRecognition.start();
         } else {
           onSpeechError(new Error("not supported"));
         }
+      } else {
+        setTimeout(() => setRecording(false), 500);
       }
     } catch (e) {
       onSpeechError(e);
