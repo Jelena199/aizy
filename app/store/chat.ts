@@ -286,7 +286,13 @@ export const useChatStore = create<ChatStore>()(
             botMessage.streaming = !voice;
             if (message) {
               botMessage.content = message;
-              console.log("onUpdate", message);
+            }
+            set(() => ({}));
+          },
+          onFinish(message) {
+            botMessage.streaming = false;
+            if (message) {
+              botMessage.content = message;
               if (voice) {
                 if ("speechSynthesis" in window) {
                   console.log("speechSynthesis");
@@ -299,13 +305,6 @@ export const useChatStore = create<ChatStore>()(
                   throw "Does not support speechSynthesis";
                 }
               }
-            }
-            set(() => ({}));
-          },
-          onFinish(message) {
-            botMessage.streaming = false;
-            if (message) {
-              botMessage.content = message;
               get().onNewMessage(botMessage);
             }
             ChatControllerPool.remove(
