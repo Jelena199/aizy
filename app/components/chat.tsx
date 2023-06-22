@@ -404,8 +404,9 @@ export function ChatActions(props: {
             setContent(initialMessage + " " + transcript);
           };
           speechRecognition.onend = () => {
-            console.log("end");
+            console.log("end", content);
             chatStore.onUserInput(content);
+            setContent("");
           };
           speechRecognition.start();
         } else {
