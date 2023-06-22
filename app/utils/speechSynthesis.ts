@@ -77,7 +77,7 @@ export function doSpeechSynthesis(
     } else {
       detectLanguage = () => "";
     }
-    const langCode = detectLanguage.detect(textPart);
+    const langCode = detectLanguage(textPart);
     utterance.lang = langCode === "zh-cn" ? "zh-CN" : "en-US";
     utterance.voice = speechSynthesis.getVoices()[0];
     // utterance.voice = speechSynthesis.getVoices().find(voice => voice.name === OutC[0].google_voice) || null;
