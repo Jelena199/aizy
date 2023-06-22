@@ -320,6 +320,7 @@ export function ChatActions(props: {
   showPromptModal: () => void;
   scrollToBottom: () => void;
   showPromptHints: () => void;
+  onSpeechStart: () => void;
   hitBottom: boolean;
 }) {
   const config = useAppConfig();
@@ -339,90 +340,6 @@ export function ChatActions(props: {
   // stop all responses
   const couldStop = ChatControllerPool.hasPending();
   const stopAll = () => ChatControllerPool.stopAll();
-
-  const [recording, setRecording] = useState(false);
-  const [speechError, setSpeechError] = useState<string | null>(null);
-  const [content, setContent] = useState<string>("");
-
-  const onSpeechError = useCallback((e: any) => {
-    setSpeechError(e.message);
-    try {
-      speechRecognition?.stop();
-    } catch (e) {}
-    setRecording(false);
-  }, []);
-  const onSpeechStart = useCallback(async () => {
-    let granted = false;
-    let denied = false;
-
-    try {
-      const result = await navigator.permissions.query({
-        name: "microphone" as any,
-      });
-      if (result.state == "granted") {
-        granted = true;
-      } else if (result.state == "denied") {
-        denied = true;
-      }
-    } catch (e) {}
-
-    if (!granted && !denied) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: false,
-          audio: true,
-        });
-        stream.getTracks().forEach((track) => track.stop());
-        granted = true;
-      } catch (e) {
-        denied = true;
-      }
-    }
-
-    if (denied) {
-      onSpeechError(new Error("speech permission was not granted"));
-      return;
-    }
-
-    try {
-      if (!recording) {
-        setRecording(true);
-        setSpeechRecognition();
-        if (speechRecognition) {
-          const initialMessage = content;
-          speechRecognition.continuous = true;
-          speechRecognition.interimResults = true;
-          speechRecognition.onresult = (event) => {
-            let transcript = "";
-            for (let i = 0; i < event.results.length; i++) {
-              if (event.results[i].isFinal && event.results[i][0].confidence) {
-                transcript += event.results[i][0].transcript;
-              }
-            }
-            setContent(initialMessage + " " + transcript);
-            console.log("result", content);
-          };
-          speechRecognition.onspeechend = () => {
-            console.log("end", content);
-            chatStore.onUserInput(content);
-            setContent("");
-          };
-          speechRecognition.start();
-        } else {
-          onSpeechError(new Error("not supported"));
-        }
-      } else {
-        setTimeout(() => setRecording(false), 500);
-      }
-    } catch (e) {
-      onSpeechError(e);
-    }
-  }, [recording, content, onSpeechError]);
-
-  useEffect(() => {
-    console.log("effect, speech error", speechError);
-    if (speechError) toast(speechError);
-  }, [speechError]);
 
   return (
     <div className={chatStyle["chat-input-actions"]}>
@@ -499,7 +416,7 @@ export function ChatActions(props: {
 
       <div
         className={`${chatStyle["chat-input-action"]} clickable`}
-        onClick={onSpeechStart}
+        onClick={props.onSpeechStart}
       >
         <MicrophoneIcon />
       </div>
@@ -658,6 +575,96 @@ export function Chat() {
       e.preventDefault();
     }
   };
+
+  //recording
+
+  const [recording, setRecording] = useState(false);
+  const [speechError, setSpeechError] = useState<string | null>(null);
+  const [content, setContent] = useState<string>("");
+
+  const onSpeechError = useCallback((e: any) => {
+    setSpeechError(e.message);
+    try {
+      speechRecognition?.stop();
+    } catch (e) {}
+    setRecording(false);
+  }, []);
+  const onSpeechStart = useCallback(async () => {
+    let granted = false;
+    let denied = false;
+
+    try {
+      const result = await navigator.permissions.query({
+        name: "microphone" as any,
+      });
+      if (result.state == "granted") {
+        granted = true;
+      } else if (result.state == "denied") {
+        denied = true;
+      }
+    } catch (e) {}
+
+    if (!granted && !denied) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: false,
+          audio: true,
+        });
+        stream.getTracks().forEach((track) => track.stop());
+        granted = true;
+      } catch (e) {
+        denied = true;
+      }
+    }
+
+    if (denied) {
+      onSpeechError(new Error("speech permission was not granted"));
+      return;
+    }
+
+    try {
+      if (!recording) {
+        setRecording(true);
+        setSpeechRecognition();
+        if (speechRecognition) {
+          const initialMessage = content;
+          speechRecognition.continuous = true;
+          speechRecognition.interimResults = true;
+          speechRecognition.onresult = (event) => {
+            let transcript = "";
+            for (let i = 0; i < event.results.length; i++) {
+              if (event.results[i].isFinal && event.results[i][0].confidence) {
+                transcript += event.results[i][0].transcript;
+              }
+            }
+            setContent(initialMessage + " " + transcript);
+            console.log("result", content, transcript);
+          };
+          speechRecognition.onspeechend = () => {
+            console.log("end", content);
+            chatStore.onUserInput(content);
+            setContent("");
+          };
+          speechRecognition.start();
+        } else {
+          onSpeechError(new Error("not supported"));
+        }
+      } else {
+        if (speechRecognition) {
+          speechRecognition.stop();
+        } else {
+          onSpeechError(new Error("not supported"));
+        }
+      }
+    } catch (e) {
+      onSpeechError(e);
+    }
+  }, [recording, content, onSpeechError]);
+
+  useEffect(() => {
+    console.log("effect, speech error", speechError);
+    if (speechError) toast(speechError);
+  }, [speechError]);
 
   const findLastUserIndex = (messageId: number) => {
     // find last user input message and resend
@@ -960,6 +967,7 @@ export function Chat() {
             setUserInput("/");
             onSearch("");
           }}
+          onSpeechStart={onSpeechStart}
         />
         <div className={styles["chat-input-panel-inner"]}>
           <textarea
