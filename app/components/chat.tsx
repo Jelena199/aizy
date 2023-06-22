@@ -642,15 +642,10 @@ export function Chat() {
             if (inputRef.current) inputRef.current.value += transcript;
             console.log("result", transcript);
             if (transcript != "") {
+              console.log("res test", event.results);
               doSubmit(transcript);
               transcript = "";
             }
-          };
-          speechRecognition.onspeechend = () => {
-            console.log("end", content);
-            chatStore.onUserInput(content);
-            setContent("");
-            setRecording(false);
           };
           speechRecognition.start();
         } else {
