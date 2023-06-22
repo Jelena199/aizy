@@ -278,7 +278,7 @@ export const useChatStore = create<ChatStore>()(
         });
 
         // make request
-        console.log("[User Input] ", sendMessages);
+        console.log("[User Input] ", sendMessages, voice);
         api.llm.chat({
           messages: sendMessages,
           config: { ...modelConfig, stream: !voice },
@@ -286,12 +286,16 @@ export const useChatStore = create<ChatStore>()(
             botMessage.streaming = !voice;
             if (message) {
               botMessage.content = message;
+              console.log("onUpdate", message);
               if (voice) {
                 if ("speechSynthesis" in window) {
+                  console.log("speechSynthesis");
                   doSpeechSynthesis(message, () => {
                     this.onError ? this.onError(Error("speech error")) : null;
                   });
+                  console.log("finished speechSynthesis");
                 } else {
+                  console.log("not support speechSynthesis");
                   throw "Does not support speechSynthesis";
                 }
               }
