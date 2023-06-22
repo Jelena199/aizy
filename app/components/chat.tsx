@@ -631,7 +631,6 @@ export function Chat() {
           speechRecognition.interimResults = true;
           speechRecognition.onresult = (event) => {
             let transcript = "";
-            console.log("result test", event.results);
             if (
               event.results[event.results.length - 1].isFinal &&
               event.results[event.results.length - 1][0].confidence
@@ -640,10 +639,9 @@ export function Chat() {
                 event.results[event.results.length - 1][0].transcript;
             }
             if (inputRef.current) inputRef.current.value += transcript;
-            console.log("result", transcript);
             if (transcript != "") {
+              setRecording(false);
               doSubmit(transcript);
-              transcript = "";
             }
           };
           speechRecognition.start();
