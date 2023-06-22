@@ -640,7 +640,6 @@ export function Chat() {
             }
             if (inputRef.current) inputRef.current.value += transcript;
             if (transcript != "") {
-              setRecording(false);
               doSubmit(transcript);
             }
           };
@@ -650,12 +649,15 @@ export function Chat() {
         }
       } else {
         if (speechRecognition) {
+          setRecording(false);
           speechRecognition.stop();
         } else {
+          setRecording(false);
           onSpeechError(new Error("not supported"));
         }
       }
     } catch (e) {
+      setRecording(false);
       onSpeechError(e);
     }
   }, [recording, content, onSpeechError]);
