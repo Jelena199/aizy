@@ -641,7 +641,10 @@ export function Chat() {
             setContent(initialMessage + " " + transcript);
             if (inputRef.current) inputRef.current.value += transcript;
             console.log("result", content, transcript);
-            if (transcript != "") doSubmit(transcript);
+            if (transcript != "") {
+              doSubmit(transcript);
+              transcript = "";
+            }
           };
           speechRecognition.onspeechend = () => {
             console.log("end", content);
