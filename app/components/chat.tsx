@@ -28,6 +28,7 @@ import ResetIcon from "../icons/reload.svg";
 import BreakIcon from "../icons/break.svg";
 import SettingsIcon from "../icons/chat-settings.svg";
 import MicrophoneIcon from "../icons/microphone.svg";
+import MicrophoneOffIcon from "../icons/microphone_off.svg";
 
 import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
@@ -322,6 +323,7 @@ export function ChatActions(props: {
   showPromptHints: () => void;
   onSpeechStart: () => void;
   hitBottom: boolean;
+  recording: boolean;
 }) {
   const config = useAppConfig();
   const navigate = useNavigate();
@@ -418,7 +420,7 @@ export function ChatActions(props: {
         className={`${chatStyle["chat-input-action"]} clickable`}
         onClick={props.onSpeechStart}
       >
-        <MicrophoneIcon />
+        {props.recording ? <MicrophoneIcon /> : <MicrophoneOffIcon />}
       </div>
     </div>
   );
@@ -956,6 +958,7 @@ export function Chat() {
           showPromptModal={() => setShowPromptModal(true)}
           scrollToBottom={scrollToBottom}
           hitBottom={hitBottom}
+          recording={recording}
           showPromptHints={() => {
             // Click again to close
             if (promptHints.length > 0) {
