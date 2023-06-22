@@ -545,7 +545,6 @@ export function Chat() {
 
       // auto sync mask config from global config
       if (session.mask.syncGlobalConfig) {
-        console.log("[Mask] syncing from global, name = ", session.mask.name);
         session.mask.modelConfig = { ...config.modelConfig };
       }
     });
@@ -592,7 +591,6 @@ export function Chat() {
   const onSpeechStart = useCallback(async () => {
     let granted = false;
     let denied = false;
-    console.log("speech started");
 
     try {
       const result = await navigator.permissions.query({
@@ -642,7 +640,6 @@ export function Chat() {
             if (inputRef.current) inputRef.current.value += transcript;
             console.log("result", transcript);
             if (transcript != "") {
-              console.log("res test", event.results);
               doSubmit(transcript);
               transcript = "";
             }
@@ -664,7 +661,6 @@ export function Chat() {
   }, [recording, content, onSpeechError]);
 
   useEffect(() => {
-    console.log("effect, speech error", speechError);
     if (speechError) toast(speechError);
   }, [speechError]);
 
