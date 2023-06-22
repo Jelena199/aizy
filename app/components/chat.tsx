@@ -592,6 +592,7 @@ export function Chat() {
   const onSpeechStart = useCallback(async () => {
     let granted = false;
     let denied = false;
+    console.log("speech started");
 
     try {
       const result = await navigator.permissions.query({
@@ -638,6 +639,7 @@ export function Chat() {
               }
             }
             setContent(initialMessage + " " + transcript);
+            if (inputRef.current) inputRef.current.value += transcript;
             console.log("result", content, transcript);
           };
           speechRecognition.onspeechend = () => {
