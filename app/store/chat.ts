@@ -296,9 +296,7 @@ export const useChatStore = create<ChatStore>()(
               if (voice) {
                 if ("speechSynthesis" in window) {
                   console.log("speechSynthesis");
-                  doSpeechSynthesis(message, () => {
-                    this.onError ? this.onError(Error("speech error")) : null;
-                  });
+                  doSpeechSynthesis(message, () => {});
                   console.log("finished speechSynthesis");
                 } else {
                   console.log("not support speechSynthesis");
