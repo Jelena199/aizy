@@ -633,6 +633,7 @@ export function Chat() {
           speechRecognition.interimResults = true;
           speechRecognition.onresult = (event) => {
             let transcript = "";
+            console.log(event.results);
             for (let i = 0; i < event.results.length; i++) {
               if (event.results[i].isFinal && event.results[i][0].confidence) {
                 transcript += event.results[i][0].transcript;
