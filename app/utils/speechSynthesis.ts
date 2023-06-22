@@ -69,16 +69,8 @@ export function doSpeechSynthesis(
 
   const utterances = textParts.map((textPart) => {
     const utterance = new SpeechSynthesisUtterance(textPart);
-    let detectLanguage;
-    if (typeof window === "undefined") {
-      // Only import langdetect on the server-side
-      const langdetect = require("langdetect");
-      detectLanguage = langdetect.detect;
-    } else {
-      detectLanguage = () => "";
-    }
-    const langCode = detectLanguage(textPart);
-    utterance.lang = langCode === "zh-cn" ? "zh-CN" : "en-US";
+    const langCode = "en-US";
+    utterance.lang = langCode;
     utterance.voice = speechSynthesis.getVoices()[0];
     // utterance.voice = speechSynthesis.getVoices().find(voice => voice.name === OutC[0].google_voice) || null;
 
