@@ -400,9 +400,11 @@ export function ChatActions(props: {
                 transcript += event.results[i][0].transcript;
               }
             }
+            console.log(transcript);
             setContent(initialMessage + " " + transcript);
           };
-          speechRecognition.onend = (event) => {
+          speechRecognition.onend = () => {
+            console.log("end");
             chatStore.onUserInput(content);
           };
           speechRecognition.start();
