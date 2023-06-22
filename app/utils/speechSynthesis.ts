@@ -1,5 +1,3 @@
-import langdetect from "langdetect";
-
 export function cleanStringToSynthesis(str: string) {
   str = str
     .trim()
@@ -71,8 +69,16 @@ export function doSpeechSynthesis(
 
   const utterances = textParts.map((textPart) => {
     const utterance = new SpeechSynthesisUtterance(textPart);
+    let detectLanguage;
+    if (typeof window === "undefined") {
+      // Only import langdetect on the server-side
+      const langdetect = require("langdetect");
+      detectLanguage = langdetect.detect;
+    } else {
+      detectLanguage = () => "";
+    }
     utterance.lang =
-      langdetect.detect(textPart) === "zh-cn" ? "zh-CN" : "en-US";
+      detectLanguage.detect(textPart) === "zh-cn" ? "zh-CN" : "en-US";
     // utterance.voice = speechSynthesis.getVoices().find(voice => voice.name === OutC[0].google_voice) || null;
 
     // if (true /*!utterance.voice*/) {
