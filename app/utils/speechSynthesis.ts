@@ -77,8 +77,9 @@ export function doSpeechSynthesis(
     } else {
       detectLanguage = () => "";
     }
-    utterance.lang =
-      detectLanguage.detect(textPart) === "zh-cn" ? "zh-CN" : "en-US";
+    const langCode = detectLanguage.detect(textPart);
+    utterance.lang = langCode === "zh-cn" ? "zh-CN" : "en-US";
+    utterance.voice = speechSynthesis.getVoices()[0];
     // utterance.voice = speechSynthesis.getVoices().find(voice => voice.name === OutC[0].google_voice) || null;
 
     // if (true /*!utterance.voice*/) {

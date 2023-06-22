@@ -629,7 +629,6 @@ export function Chat() {
         setRecording(true);
         setSpeechRecognition();
         if (speechRecognition) {
-          const initialMessage = content;
           speechRecognition.continuous = true;
           speechRecognition.interimResults = true;
           speechRecognition.onresult = (event) => {
@@ -645,6 +644,10 @@ export function Chat() {
             if (transcript != "") {
               doSubmit(transcript, true);
             }
+          };
+          speechRecognition.onend = () => {
+            setRecording(false);
+            if (speechRecognition) speechRecognition.stop();
           };
           speechRecognition.start();
         } else {
