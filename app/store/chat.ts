@@ -11,6 +11,7 @@ import { StoreKey } from "../constant";
 import { api, RequestMessage } from "../client/api";
 import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
+import { doSpeechSynthesis } from "../utils/speechSynthesis";
 
 export type ChatMessage = RequestMessage & {
   date: string;
@@ -85,7 +86,7 @@ interface ChatStore {
   deleteSession: (index: number) => void;
   currentSession: () => ChatSession;
   onNewMessage: (message: ChatMessage) => void;
-  onUserInput: (content: string) => Promise<void>;
+  onUserInput: (content: string, voice: boolean) => Promise<void>;
   summarizeSession: () => void;
   updateStat: (message: ChatMessage) => void;
   updateCurrentSession: (updater: (session: ChatSession) => void) => void;
@@ -232,7 +233,7 @@ export const useChatStore = create<ChatStore>()(
         get().summarizeSession();
       },
 
-      async onUserInput(content) {
+      async onUserInput(content, voice) {
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
 
@@ -243,7 +244,7 @@ export const useChatStore = create<ChatStore>()(
 
         const botMessage: ChatMessage = createMessage({
           role: "assistant",
-          streaming: true,
+          streaming: !voice,
           id: userMessage.id! + 1,
           model: modelConfig.model,
         });
@@ -280,11 +281,20 @@ export const useChatStore = create<ChatStore>()(
         console.log("[User Input] ", sendMessages);
         api.llm.chat({
           messages: sendMessages,
-          config: { ...modelConfig, stream: true },
+          config: { ...modelConfig, stream: !voice },
           onUpdate(message) {
-            botMessage.streaming = true;
+            botMessage.streaming = !voice;
             if (message) {
               botMessage.content = message;
+              if (voice) {
+                if ("speechSynthesis" in window) {
+                  doSpeechSynthesis(message, () => {
+                    this.onError ? this.onError(Error("speech error")) : null;
+                  });
+                } else {
+                  throw "Does not support speechSynthesis";
+                }
+              }
             }
             set(() => ({}));
           },

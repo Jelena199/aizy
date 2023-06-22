@@ -509,10 +509,10 @@ export function Chat() {
     }
   };
 
-  const doSubmit = (userInput: string) => {
+  const doSubmit = (userInput: string, voiceMode: boolean) => {
     if (userInput.trim() === "") return;
     setIsLoading(true);
-    chatStore.onUserInput(userInput).then(() => setIsLoading(false));
+    chatStore.onUserInput(userInput, voiceMode).then(() => setIsLoading(false));
     localStorage.setItem(LAST_INPUT_KEY, userInput);
     setUserInput("");
     setPromptHints([]);
@@ -566,7 +566,7 @@ export function Chat() {
       return;
     }
     if (shouldSubmit(e) && promptHints.length === 0) {
-      doSubmit(userInput);
+      doSubmit(userInput, false);
       e.preventDefault();
     }
   };
@@ -593,6 +593,7 @@ export function Chat() {
   const onSpeechStart = useCallback(async () => {
     let granted = false;
     let denied = false;
+    if (speechRecognition) speechRecognition.lang = "en-US, zh-CN";
 
     try {
       const result = await navigator.permissions.query({
@@ -642,7 +643,7 @@ export function Chat() {
             }
             if (inputRef.current) inputRef.current.value += transcript;
             if (transcript != "") {
-              doSubmit(transcript);
+              doSubmit(transcript, true);
             }
           };
           speechRecognition.start();
@@ -704,7 +705,7 @@ export function Chat() {
     setIsLoading(true);
     const content = session.messages[userIndex].content;
     deleteMessage(userIndex);
-    chatStore.onUserInput(content).then(() => setIsLoading(false));
+    chatStore.onUserInput(content, false).then(() => setIsLoading(false));
     inputRef.current?.focus();
   };
 
@@ -777,7 +778,7 @@ export function Chat() {
   useCommand({
     fill: setUserInput,
     submit: (text) => {
-      doSubmit(text);
+      doSubmit(text, false);
     },
   });
 
@@ -990,7 +991,7 @@ export function Chat() {
             text={Locale.Chat.Send}
             className={styles["chat-input-send"]}
             type="primary"
-            onClick={() => doSubmit(userInput)}
+            onClick={() => doSubmit(userInput, false)}
           />
         </div>
       </div>

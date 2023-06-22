@@ -3602,6 +3602,13 @@ kleur@^4.0.3:
   resolved "https://registry.yarnpkg.com/kleur/-/kleur-4.1.5.tgz#95106101795f7050c6c650f350c683febddb1780"
   integrity sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==
 
+langdetect@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/langdetect/-/langdetect-0.2.1.tgz#d7ca8339497a4dd65c4df935d46e344bfea86d01"
+  integrity sha512-vWK2xz8Urp6J0RFwnrR8+d0DQ2yIGjCOqAxBoXNMVFv4ZDmFsbCcNEtwuVnaQ5+ltwZ4Z5rTtuTwHSaEWFdw+A==
+  dependencies:
+    unicode-9.0.0 "0.7.0"
+
 language-subtag-registry@~0.3.2:
   version "0.3.22"
   resolved "https://registry.yarnpkg.com/language-subtag-registry/-/language-subtag-registry-0.3.22.tgz#2e1500861b2e457eba7e7ae86877cbd08fa1fd1d"
@@ -5344,6 +5351,11 @@ unbox-primitive@^1.0.2:
     has-bigints "^1.0.2"
     has-symbols "^1.0.3"
     which-boxed-primitive "^1.0.2"
+
+unicode-9.0.0@0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/unicode-9.0.0/-/unicode-9.0.0-0.7.0.tgz#4d303caf9c6dbf2b979943c18a384e226643b937"
+  integrity sha512-aqL0GQ3LB2nC3ZEKBZ93hfn7QY80sVGk+OT9Sc6lTxl4wRiwzUBRlAjJB9Fe4+5XydXOV+tb8udp5oRBoED5Tw==
 
 unicode-canonical-property-names-ecmascript@^2.0.0:
   version "2.0.0"
