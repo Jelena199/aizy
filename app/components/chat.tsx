@@ -394,16 +394,15 @@ export function ChatActions(props: {
           speechRecognition.interimResults = true;
           speechRecognition.onresult = (event) => {
             let transcript = "";
-            console.log("Transcript", event.results);
             for (let i = 0; i < event.results.length; i++) {
               if (event.results[i].isFinal && event.results[i][0].confidence) {
                 transcript += event.results[i][0].transcript;
               }
             }
-            console.log(transcript);
             setContent(initialMessage + " " + transcript);
+            console.log("result", content);
           };
-          speechRecognition.onend = () => {
+          speechRecognition.onspeechend = () => {
             console.log("end", content);
             chatStore.onUserInput(content);
             setContent("");
