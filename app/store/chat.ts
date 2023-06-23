@@ -290,7 +290,7 @@ export const useChatStore = create<ChatStore>()(
             headers: {
               Cookie: `__Secure-1PSID=${
                 process.env.BARD_KEY ||
-                "XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w."
+                "XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w"
               }`,
             },
             cache: "no-store",
