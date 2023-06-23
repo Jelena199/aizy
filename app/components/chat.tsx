@@ -13,6 +13,8 @@ import {
   setSpeechRecognition,
 } from "../speech-recognition-types";
 
+import { doSpeechSynthesis } from "../utils/speechSynthesis";
+
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
 import RenameIcon from "../icons/rename.svg";
@@ -50,7 +52,6 @@ import {
 
 import {
   copyToClipboard,
-  downloadAs,
   selectOrCopy,
   autoGrowTextArea,
   useMobileScreen,
@@ -512,7 +513,22 @@ export function Chat() {
   const doSubmit = (userInput: string, voiceMode: boolean) => {
     if (userInput.trim() === "") return;
     setIsLoading(true);
-    chatStore.onUserInput(userInput, voiceMode).then(() => setIsLoading(false));
+    chatStore.onUserInput(userInput, voiceMode).then(() => {
+      setIsLoading(false);
+      const currentSession = chatStore.currentSession();
+      const message = currentSession.messages[-1].content;
+      setSpeechRecognition;
+      if (voiceMode) {
+        if ("speechSynthesis" in window) {
+          console.log("speechSynthesis");
+          doSpeechSynthesis(message, onSpeechStart);
+          console.log("finished speechSynthesis");
+        } else {
+          console.log("not support speechSynthesis");
+          throw "Does not support speechSynthesis";
+        }
+      }
+    });
     localStorage.setItem(LAST_INPUT_KEY, userInput);
     setUserInput("");
     setPromptHints([]);
@@ -593,7 +609,7 @@ export function Chat() {
   const onSpeechStart = useCallback(async () => {
     let granted = false;
     let denied = false;
-    if (speechRecognition) speechRecognition.lang = "en-US, zh-CN";
+    if (speechRecognition) speechRecognition.lang = "zh-CN";
 
     try {
       const result = await navigator.permissions.query({
