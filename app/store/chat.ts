@@ -288,7 +288,7 @@ export const useChatStore = create<ChatStore>()(
         if (barding) {
           console.log("bard starting");
           const bard = new Bard(
-            "XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w",
+            "XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.",
           );
           const message = await bard.query(
             sendMessages[sendMessages.length - 1].content,
