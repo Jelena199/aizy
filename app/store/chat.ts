@@ -287,32 +287,36 @@ export const useChatStore = create<ChatStore>()(
         console.log("[User Input] ", sendMessages, voice);
         if (barding) {
           console.log("bard starting");
-          const bard = new Bard(
-            "XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.",
-          );
-          const message = await bard.query(
-            sendMessages[sendMessages.length - 1].content,
-          );
-          botMessage.streaming = false;
-          if (message) {
-            botMessage.content = message;
-            if (voice) {
-              if ("speechSynthesis" in window) {
-                console.log("speechSynthesis");
-                doSpeechSynthesis(message, onSpeechStart);
-                console.log("finished speechSynthesis");
-              } else {
-                console.log("not support speechSynthesis");
-                throw "Does not support speechSynthesis";
+          try {
+            const bard = new Bard(
+              "XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.",
+            );
+            const message = await bard.query(
+              sendMessages[sendMessages.length - 1].content,
+            );
+            botMessage.streaming = false;
+            if (message) {
+              botMessage.content = message;
+              if (voice) {
+                if ("speechSynthesis" in window) {
+                  console.log("speechSynthesis");
+                  doSpeechSynthesis(message, onSpeechStart);
+                  console.log("finished speechSynthesis");
+                } else {
+                  console.log("not support speechSynthesis");
+                  throw "Does not support speechSynthesis";
+                }
               }
+              get().onNewMessage(botMessage);
             }
-            get().onNewMessage(botMessage);
+            ChatControllerPool.remove(
+              sessionIndex,
+              botMessage.id ?? messageIndex,
+            );
+            set(() => ({}));
+          } catch (e) {
+            console.log(e);
           }
-          ChatControllerPool.remove(
-            sessionIndex,
-            botMessage.id ?? messageIndex,
-          );
-          set(() => ({}));
         } else {
           api.llm.chat({
             messages: sendMessages,
@@ -322,7 +326,6 @@ export const useChatStore = create<ChatStore>()(
               if (message) {
                 botMessage.content = message;
               }
-              set(() => ({}));
             },
             onFinish(message) {
               botMessage.streaming = false;
