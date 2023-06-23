@@ -292,7 +292,7 @@ export const useChatStore = create<ChatStore>()(
             );
             console.log("bard starting");
             const message = await bard.query(
-              sendMessages[sendMessages.length - 1].content,
+              "sendMessages[sendMessages.length - 1].content",
             );
             botMessage.streaming = false;
             if (message) {
