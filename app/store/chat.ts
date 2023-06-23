@@ -296,9 +296,10 @@ export const useChatStore = create<ChatStore>()(
           });
           const msg = await req.text();
           const snlm0e = msg.match(/"SNlM0e":"(.*?)"/);
-          if (!snlm0e || !snlm0e[1])
+          if (!snlm0e || !snlm0e[1]) {
+            console.log("SnlM0e not found (is your auth token correct?)");
             throw "SnlM0e not found (is your auth token correct?)";
-          else {
+          } else {
             botMessage.streaming = false;
             if (msg) {
               botMessage.content = msg;
@@ -320,7 +321,7 @@ export const useChatStore = create<ChatStore>()(
             );
             set(() => ({}));
           }
-        } else
+        } else {
           api.llm.chat({
             messages: sendMessages,
             config: { ...modelConfig, stream: !voice },
@@ -382,6 +383,7 @@ export const useChatStore = create<ChatStore>()(
               );
             },
           });
+        }
       },
 
       getMemoryPrompt() {
