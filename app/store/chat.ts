@@ -286,11 +286,11 @@ export const useChatStore = create<ChatStore>()(
         // make request XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w
         console.log("[User Input] ", sendMessages, voice);
         if (barding) {
-          console.log("bard starting");
           try {
             const bard = new Bard(
               "XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.",
             );
+            console.log("bard starting");
             const message = await bard.query(
               sendMessages[sendMessages.length - 1].content,
             );
