@@ -13,8 +13,6 @@ import {
   setSpeechRecognition,
 } from "../speech-recognition-types";
 
-import { doSpeechSynthesis } from "../utils/speechSynthesis";
-
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
 import RenameIcon from "../icons/rename.svg";
@@ -513,20 +511,14 @@ export function Chat() {
   const doSubmit = (userInput: string, voiceMode: boolean) => {
     if (userInput.trim() === "") return;
     setIsLoading(true);
-    chatStore.onUserInput(userInput, voiceMode).then(() => {
+    chatStore.onUserInput(userInput, voiceMode, onSpeechStart).then(() => {
       setIsLoading(false);
-      const currentSession = chatStore.currentSession();
-      const message = currentSession.messages[-1].content;
-      setSpeechRecognition;
-      if (voiceMode) {
-        if ("speechSynthesis" in window) {
-          console.log("speechSynthesis");
-          doSpeechSynthesis(message, onSpeechStart);
-          console.log("finished speechSynthesis");
-        } else {
-          console.log("not support speechSynthesis");
-          throw "Does not support speechSynthesis";
-        }
+      if (speechRecognition) {
+        setRecording(false);
+        speechRecognition.stop();
+      } else {
+        setRecording(false);
+        onSpeechError(new Error("not supported"));
       }
     });
     localStorage.setItem(LAST_INPUT_KEY, userInput);
@@ -609,7 +601,6 @@ export function Chat() {
   const onSpeechStart = useCallback(async () => {
     let granted = false;
     let denied = false;
-    if (speechRecognition) speechRecognition.lang = "zh-CN";
 
     try {
       const result = await navigator.permissions.query({
@@ -645,6 +636,7 @@ export function Chat() {
         setRecording(true);
         setSpeechRecognition();
         if (speechRecognition) {
+          if (speechRecognition) speechRecognition.lang = "en-US, zh-CN";
           speechRecognition.continuous = true;
           speechRecognition.interimResults = true;
           speechRecognition.onresult = (event) => {
@@ -724,7 +716,9 @@ export function Chat() {
     setIsLoading(true);
     const content = session.messages[userIndex].content;
     deleteMessage(userIndex);
-    chatStore.onUserInput(content, false).then(() => setIsLoading(false));
+    chatStore
+      .onUserInput(content, false, onSpeechStart)
+      .then(() => setIsLoading(false));
     inputRef.current?.focus();
   };
 

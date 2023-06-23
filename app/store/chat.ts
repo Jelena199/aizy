@@ -11,6 +11,7 @@ import { StoreKey } from "../constant";
 import { api, RequestMessage } from "../client/api";
 import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
+import { doSpeechSynthesis } from "../utils/speechSynthesis";
 
 export type ChatMessage = RequestMessage & {
   date: string;
@@ -85,7 +86,11 @@ interface ChatStore {
   deleteSession: (index: number) => void;
   currentSession: () => ChatSession;
   onNewMessage: (message: ChatMessage) => void;
-  onUserInput: (content: string, voice: boolean) => Promise<void>;
+  onUserInput: (
+    content: string,
+    voice: boolean,
+    onSpeechStart: () => Promise<void>,
+  ) => Promise<void>;
   summarizeSession: () => void;
   updateStat: (message: ChatMessage) => void;
   updateCurrentSession: (updater: (session: ChatSession) => void) => void;
@@ -232,7 +237,7 @@ export const useChatStore = create<ChatStore>()(
         get().summarizeSession();
       },
 
-      async onUserInput(content, voice) {
+      async onUserInput(content, voice, onSpeechStart) {
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
 
@@ -292,6 +297,16 @@ export const useChatStore = create<ChatStore>()(
             botMessage.streaming = false;
             if (message) {
               botMessage.content = message;
+              if (voice) {
+                if ("speechSynthesis" in window) {
+                  console.log("speechSynthesis");
+                  doSpeechSynthesis(message, onSpeechStart);
+                  console.log("finished speechSynthesis");
+                } else {
+                  console.log("not support speechSynthesis");
+                  throw "Does not support speechSynthesis";
+                }
+              }
               get().onNewMessage(botMessage);
             }
             ChatControllerPool.remove(
