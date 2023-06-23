@@ -288,10 +288,7 @@ export const useChatStore = create<ChatStore>()(
           console.log("bard starting");
           const req = await fetch("https://bard.google.com", {
             headers: {
-              Cookie: `__Secure-1PSID=${
-                process.env.BARD_KEY ||
-                "XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w"
-              }`,
+              Cookie: `__Secure-1PSID=${"XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w"}`,
             },
             cache: "no-store",
           });
