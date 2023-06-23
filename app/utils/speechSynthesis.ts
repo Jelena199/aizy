@@ -71,7 +71,13 @@ export function doSpeechSynthesis(
     const utterance = new SpeechSynthesisUtterance(textPart);
     const langCode = "zh-CN";
     utterance.lang = langCode;
-    utterance.voice = speechSynthesis.getVoices()[0];
+    const chineseVoice = window.speechSynthesis
+      .getVoices()
+      .find(
+        (voice) =>
+          voice.name === "Microsoft Huihui Desktop - Chinese (Simplified, PRC)",
+      );
+    if (chineseVoice) utterance.voice = chineseVoice;
     // utterance.voice = speechSynthesis.getVoices().find(voice => voice.name === OutC[0].google_voice) || null;
 
     // if (true /*!utterance.voice*/) {
