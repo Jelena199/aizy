@@ -323,6 +323,7 @@ export function ChatActions(props: {
   scrollToBottom: () => void;
   showPromptHints: () => void;
   onSpeechStart: () => void;
+  onBarding: () => void;
   hitBottom: boolean;
   recording: boolean;
   barding: boolean;
@@ -427,7 +428,7 @@ export function ChatActions(props: {
 
       <div
         className={`${chatStyle["chat-input-action"]} clickable`}
-        onClick={props.onSpeechStart}
+        onClick={props.onBarding}
       >
         {props.barding ? <GoogleBardIcon /> : <GoogleBardOffIcon />}
       </div>
@@ -999,6 +1000,7 @@ export function Chat() {
             onSearch("");
           }}
           onSpeechStart={onSpeechStart}
+          onBarding={() => setBarding(!barding)}
         />
         <div className={styles["chat-input-panel-inner"]}>
           <textarea
