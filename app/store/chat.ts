@@ -12,6 +12,7 @@ import { api, RequestMessage } from "../client/api";
 import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
 import { doSpeechSynthesis } from "../utils/speechSynthesis";
+import { Bard } from "bard-wrapper";
 
 export type ChatMessage = RequestMessage & {
   date: string;
@@ -282,43 +283,36 @@ export const useChatStore = create<ChatStore>()(
           session.messages.push(botMessage);
         });
 
-        // make request
+        // make request XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w
         console.log("[User Input] ", sendMessages, voice);
         if (barding) {
           console.log("bard starting");
-          const req = await fetch("https://bard.google.com", {
-            headers: {
-              Cookie: `__Secure-1PSID=${"XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w"}`,
-            },
-            cache: "no-store",
-          });
-          const msg = await req.text();
-          const snlm0e = msg.match(/"SNlM0e":"(.*?)"/);
-          if (!snlm0e || !snlm0e[1]) {
-            console.log("SnlM0e not found (is your auth token correct?)");
-            throw "SnlM0e not found (is your auth token correct?)";
-          } else {
-            botMessage.streaming = false;
-            if (msg) {
-              botMessage.content = msg;
-              if (voice) {
-                if ("speechSynthesis" in window) {
-                  console.log("speechSynthesis");
-                  doSpeechSynthesis(msg, onSpeechStart);
-                  console.log("finished speechSynthesis");
-                } else {
-                  console.log("not support speechSynthesis");
-                  throw "Does not support speechSynthesis";
-                }
+          const bard = new Bard(
+            "XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w",
+          );
+          const message = await bard.query(
+            sendMessages[sendMessages.length - 1].content,
+          );
+          botMessage.streaming = false;
+          if (message) {
+            botMessage.content = message;
+            if (voice) {
+              if ("speechSynthesis" in window) {
+                console.log("speechSynthesis");
+                doSpeechSynthesis(message, onSpeechStart);
+                console.log("finished speechSynthesis");
+              } else {
+                console.log("not support speechSynthesis");
+                throw "Does not support speechSynthesis";
               }
-              get().onNewMessage(botMessage);
             }
-            ChatControllerPool.remove(
-              sessionIndex,
-              botMessage.id ?? messageIndex,
-            );
-            set(() => ({}));
+            get().onNewMessage(botMessage);
           }
+          ChatControllerPool.remove(
+            sessionIndex,
+            botMessage.id ?? messageIndex,
+          );
+          set(() => ({}));
         } else {
           api.llm.chat({
             messages: sendMessages,
