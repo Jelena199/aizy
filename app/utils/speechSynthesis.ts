@@ -69,7 +69,7 @@ export function doSpeechSynthesis(
 
   const utterances = textParts.map((textPart) => {
     const utterance = new SpeechSynthesisUtterance(textPart);
-    const langCode = "en-US";
+    const langCode = "zh-CN";
     utterance.lang = langCode;
     utterance.voice = speechSynthesis.getVoices()[0];
     // utterance.voice = speechSynthesis.getVoices().find(voice => voice.name === OutC[0].google_voice) || null;
