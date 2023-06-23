@@ -29,6 +29,8 @@ import BreakIcon from "../icons/break.svg";
 import SettingsIcon from "../icons/chat-settings.svg";
 import MicrophoneIcon from "../icons/microphone.svg";
 import MicrophoneOffIcon from "../icons/microphone_off.svg";
+import GoogleBardIcon from "../icons/google-bard-on.svg";
+import GoogleBardOffIcon from "../icons/google-bard-off.svg";
 
 import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
@@ -323,6 +325,7 @@ export function ChatActions(props: {
   onSpeechStart: () => void;
   hitBottom: boolean;
   recording: boolean;
+  barding: boolean;
 }) {
   const config = useAppConfig();
   const navigate = useNavigate();
@@ -421,6 +424,13 @@ export function ChatActions(props: {
       >
         {props.recording ? <MicrophoneIcon /> : <MicrophoneOffIcon />}
       </div>
+
+      <div
+        className={`${chatStyle["chat-input-action"]} clickable`}
+        onClick={props.onSpeechStart}
+      >
+        {props.barding ? <GoogleBardIcon /> : <GoogleBardOffIcon />}
+      </div>
     </div>
   );
 }
@@ -511,16 +521,18 @@ export function Chat() {
   const doSubmit = (userInput: string, voiceMode: boolean) => {
     if (userInput.trim() === "") return;
     setIsLoading(true);
-    chatStore.onUserInput(userInput, voiceMode, onSpeechStart).then(() => {
-      setIsLoading(false);
-      if (speechRecognition) {
-        setRecording(false);
-        speechRecognition.stop();
-      } else {
-        setRecording(false);
-        onSpeechError(new Error("not supported"));
-      }
-    });
+    chatStore
+      .onUserInput(userInput, voiceMode, barding, onSpeechStart)
+      .then(() => {
+        setIsLoading(false);
+        if (speechRecognition) {
+          setRecording(false);
+          speechRecognition.stop();
+        } else {
+          setRecording(false);
+          onSpeechError(new Error("not supported"));
+        }
+      });
     localStorage.setItem(LAST_INPUT_KEY, userInput);
     setUserInput("");
     setPromptHints([]);
@@ -588,8 +600,8 @@ export function Chat() {
   //recording
 
   const [recording, setRecording] = useState(false);
+  const [barding, setBarding] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
-  const [content, setContent] = useState<string>("");
 
   const onSpeechError = useCallback((e: any) => {
     setSpeechError(e.message);
@@ -674,7 +686,7 @@ export function Chat() {
       setRecording(false);
       onSpeechError(e);
     }
-  }, [recording, content, onSpeechError]);
+  }, [recording, onSpeechError]);
 
   useEffect(() => {
     if (speechError) toast(speechError);
@@ -717,7 +729,7 @@ export function Chat() {
     const content = session.messages[userIndex].content;
     deleteMessage(userIndex);
     chatStore
-      .onUserInput(content, false, onSpeechStart)
+      .onUserInput(content, false, barding, onSpeechStart)
       .then(() => setIsLoading(false));
     inputRef.current?.focus();
   };
@@ -876,7 +888,8 @@ export function Chat() {
             !(message.preview || message.content.length === 0);
           const showTyping = message.preview || message.streaming;
 
-          const shouldShowClearContextDivider = i === clearContextIndex - 1;
+          const shouldShowClearContextDivider: boolean =
+            i === clearContextIndex - 1;
 
           return (
             <>
@@ -973,6 +986,7 @@ export function Chat() {
           scrollToBottom={scrollToBottom}
           hitBottom={hitBottom}
           recording={recording}
+          barding={barding}
           showPromptHints={() => {
             // Click again to close
             if (promptHints.length > 0) {

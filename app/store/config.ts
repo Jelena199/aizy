@@ -85,10 +85,6 @@ export const ALL_MODELS = [
     available: true,
   },
   {
-    name: "google-bard",
-    available: true,
-  },
-  {
     name: "qwen-v1", // 通义千问
     available: false,
   },
