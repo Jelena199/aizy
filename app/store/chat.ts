@@ -285,6 +285,7 @@ export const useChatStore = create<ChatStore>()(
         // make request
         console.log("[User Input] ", sendMessages, voice);
         if (barding) {
+          console.log("bard starting");
           const req = await fetch("https://bard.google.com", {
             headers: {
               Cookie: `__Secure-1PSID=${
