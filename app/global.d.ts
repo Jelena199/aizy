@@ -9,3 +9,11 @@ declare module "*.scss" {
 }
 
 declare module "*.svg";
+declare module "langdetect";
+declare module "bard-wrapper" {
+  export class Bard {
+    constructor(auth: string, locale?: string);
+    setMemory(mem: boolean): void;
+    query(prompt: string): Promise<string>;
+  }
+}

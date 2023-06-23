@@ -1,5 +1,17 @@
 import { useDebouncedCallback } from "use-debounce";
-import { useState, useRef, useEffect, useLayoutEffect } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+} from "react";
+import toast, { Toaster } from "react-hot-toast";
+
+import {
+  speechRecognition,
+  setSpeechRecognition,
+} from "../speech-recognition-types";
 
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
@@ -15,6 +27,10 @@ import MinIcon from "../icons/min.svg";
 import ResetIcon from "../icons/reload.svg";
 import BreakIcon from "../icons/break.svg";
 import SettingsIcon from "../icons/chat-settings.svg";
+import MicrophoneIcon from "../icons/microphone.svg";
+import MicrophoneOffIcon from "../icons/microphone_off.svg";
+import GoogleBardIcon from "../icons/google-bard-on.svg";
+import GoogleBardOffIcon from "../icons/google-bard-off.svg";
 
 import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
@@ -36,7 +52,6 @@ import {
 
 import {
   copyToClipboard,
-  downloadAs,
   selectOrCopy,
   autoGrowTextArea,
   useMobileScreen,
@@ -52,7 +67,7 @@ import { IconButton } from "./button";
 import styles from "./home.module.scss";
 import chatStyle from "./chat.module.scss";
 
-import { ListItem, Modal } from "./ui-lib";
+import { ListItem, Modal, Toast } from "./ui-lib";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LAST_INPUT_KEY, Path, REQUEST_TIMEOUT_MS } from "../constant";
 import { Avatar } from "./emoji";
@@ -307,7 +322,11 @@ export function ChatActions(props: {
   showPromptModal: () => void;
   scrollToBottom: () => void;
   showPromptHints: () => void;
+  onSpeechStart: () => void;
+  onBarding: () => void;
   hitBottom: boolean;
+  recording: boolean;
+  barding: boolean;
 }) {
   const config = useAppConfig();
   const navigate = useNavigate();
@@ -329,6 +348,7 @@ export function ChatActions(props: {
 
   return (
     <div className={chatStyle["chat-input-actions"]}>
+      <Toaster />
       {couldStop && (
         <div
           className={`${chatStyle["chat-input-action"]} clickable`}
@@ -397,6 +417,20 @@ export function ChatActions(props: {
         }}
       >
         <BreakIcon />
+      </div>
+
+      <div
+        className={`${chatStyle["chat-input-action"]} clickable`}
+        onClick={props.onSpeechStart}
+      >
+        {props.recording ? <MicrophoneIcon /> : <MicrophoneOffIcon />}
+      </div>
+
+      <div
+        className={`${chatStyle["chat-input-action"]} clickable`}
+        onClick={props.onBarding}
+      >
+        {props.barding ? <GoogleBardIcon /> : <GoogleBardOffIcon />}
       </div>
     </div>
   );
@@ -485,10 +519,21 @@ export function Chat() {
     }
   };
 
-  const doSubmit = (userInput: string) => {
+  const doSubmit = (userInput: string, voiceMode: boolean) => {
     if (userInput.trim() === "") return;
     setIsLoading(true);
-    chatStore.onUserInput(userInput).then(() => setIsLoading(false));
+    chatStore
+      .onUserInput(userInput, voiceMode, barding, onSpeechStart)
+      .then(() => {
+        setIsLoading(false);
+        if (speechRecognition) {
+          setRecording(false);
+          speechRecognition.stop();
+        } else {
+          setRecording(false);
+          onSpeechError(new Error("not supported"));
+        }
+      });
     localStorage.setItem(LAST_INPUT_KEY, userInput);
     setUserInput("");
     setPromptHints([]);
@@ -523,7 +568,6 @@ export function Chat() {
 
       // auto sync mask config from global config
       if (session.mask.syncGlobalConfig) {
-        console.log("[Mask] syncing from global, name = ", session.mask.name);
         session.mask.modelConfig = { ...config.modelConfig };
       }
     });
@@ -543,7 +587,7 @@ export function Chat() {
       return;
     }
     if (shouldSubmit(e) && promptHints.length === 0) {
-      doSubmit(userInput);
+      doSubmit(userInput, false);
       e.preventDefault();
     }
   };
@@ -553,6 +597,101 @@ export function Chat() {
       e.preventDefault();
     }
   };
+
+  //recording
+
+  const [recording, setRecording] = useState(false);
+  const [barding, setBarding] = useState(false);
+  const [speechError, setSpeechError] = useState<string | null>(null);
+
+  const onSpeechError = useCallback((e: any) => {
+    setSpeechError(e.message);
+    try {
+      speechRecognition?.stop();
+    } catch (e) {}
+    setRecording(false);
+  }, []);
+  const onSpeechStart = useCallback(async () => {
+    let granted = false;
+    let denied = false;
+
+    try {
+      const result = await navigator.permissions.query({
+        name: "microphone" as any,
+      });
+      if (result.state == "granted") {
+        granted = true;
+      } else if (result.state == "denied") {
+        denied = true;
+      }
+    } catch (e) {}
+
+    if (!granted && !denied) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: false,
+          audio: true,
+        });
+        stream.getTracks().forEach((track) => track.stop());
+        granted = true;
+      } catch (e) {
+        denied = true;
+      }
+    }
+
+    if (denied) {
+      onSpeechError(new Error("speech permission was not granted"));
+      return;
+    }
+
+    try {
+      if (!recording) {
+        setRecording(true);
+        setSpeechRecognition();
+        if (speechRecognition) {
+          if (speechRecognition) speechRecognition.lang = "zh-CN";
+          speechRecognition.continuous = true;
+          speechRecognition.interimResults = true;
+          speechRecognition.onresult = (event) => {
+            let transcript = "";
+            if (
+              event.results[event.results.length - 1].isFinal &&
+              event.results[event.results.length - 1][0].confidence
+            ) {
+              transcript +=
+                event.results[event.results.length - 1][0].transcript;
+            }
+            if (inputRef.current) inputRef.current.value += transcript;
+            if (transcript != "") {
+              doSubmit(transcript, true);
+            }
+          };
+          speechRecognition.onend = () => {
+            setRecording(false);
+            if (speechRecognition) speechRecognition.stop();
+          };
+          speechRecognition.start();
+        } else {
+          onSpeechError(new Error("not supported"));
+        }
+      } else {
+        if (speechRecognition) {
+          setRecording(false);
+          speechRecognition.stop();
+        } else {
+          setRecording(false);
+          onSpeechError(new Error("not supported"));
+        }
+      }
+    } catch (e) {
+      setRecording(false);
+      onSpeechError(e);
+    }
+  }, [recording, onSpeechError]);
+
+  useEffect(() => {
+    if (speechError) toast(speechError);
+  }, [speechError]);
 
   const findLastUserIndex = (messageId: number) => {
     // find last user input message and resend
@@ -590,7 +729,9 @@ export function Chat() {
     setIsLoading(true);
     const content = session.messages[userIndex].content;
     deleteMessage(userIndex);
-    chatStore.onUserInput(content).then(() => setIsLoading(false));
+    chatStore
+      .onUserInput(content, false, barding, onSpeechStart)
+      .then(() => setIsLoading(false));
     inputRef.current?.focus();
   };
 
@@ -663,7 +804,7 @@ export function Chat() {
   useCommand({
     fill: setUserInput,
     submit: (text) => {
-      doSubmit(text);
+      doSubmit(text, false);
     },
   });
 
@@ -748,7 +889,8 @@ export function Chat() {
             !(message.preview || message.content.length === 0);
           const showTyping = message.preview || message.streaming;
 
-          const shouldShowClearContextDivider = i === clearContextIndex - 1;
+          const shouldShowClearContextDivider: boolean =
+            i === clearContextIndex - 1;
 
           return (
             <>
@@ -844,6 +986,8 @@ export function Chat() {
           showPromptModal={() => setShowPromptModal(true)}
           scrollToBottom={scrollToBottom}
           hitBottom={hitBottom}
+          recording={recording}
+          barding={barding}
           showPromptHints={() => {
             // Click again to close
             if (promptHints.length > 0) {
@@ -855,6 +999,8 @@ export function Chat() {
             setUserInput("/");
             onSearch("");
           }}
+          onSpeechStart={onSpeechStart}
+          onBarding={() => setBarding(!barding)}
         />
         <div className={styles["chat-input-panel-inner"]}>
           <textarea
@@ -874,7 +1020,7 @@ export function Chat() {
             text={Locale.Chat.Send}
             className={styles["chat-input-send"]}
             type="primary"
-            onClick={() => doSubmit(userInput)}
+            onClick={() => doSubmit(userInput, false)}
           />
         </div>
       </div>

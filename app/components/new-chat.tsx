@@ -45,6 +45,7 @@ function useMaskGroup(masks: Mask[]) {
 
       const rect = appBody.getBoundingClientRect();
       const maxWidth = rect.width;
+
       const maxHeight = rect.height * 0.6;
       const maskItemWidth = 120;
       const maskItemHeight = 50;

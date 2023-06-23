@@ -1,5 +1,5 @@
 import { ACCESS_CODE_PREFIX } from "../constant";
-import { ChatMessage, ModelConfig, ModelType, useAccessStore } from "../store";
+import { ChatMessage, ModelType, useAccessStore } from "../store";
 import { ChatGPTApi } from "./platforms/openai";
 
 export const ROLES = ["system", "user", "assistant"] as const;
@@ -64,8 +64,7 @@ export class ClientApi {
       .concat([
         {
           from: "human",
-          value:
-            "Share from [DogAi Chat] :https://dogai.com",
+          value: "Share from [DogAi Chat] :https://dogai.com",
         },
       ]);
     // 敬告二开开发者们，为了开源大模型的发展，请不要修改上述消息，此消息用于后续数据清洗使用
