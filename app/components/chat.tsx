@@ -665,6 +665,7 @@ export function Chat() {
       if (!recording) {
         setRecording(true);
         onMobileLog("1 recording");
+        setSpeechRecognition();
         if (speechRecognition) {
           onMobileLog("1 speechrecognition");
           speechRecognition.lang = "zh-CN";
