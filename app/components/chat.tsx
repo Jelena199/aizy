@@ -657,6 +657,7 @@ export function Chat() {
         if (speechRecognition) {
           onSpeechLog("speechrecognition true");
           speechRecognition.lang = "zh-CN";
+          // speechRecognition.maxAlternatives = 5;
           speechRecognition.continuous = true;
           speechRecognition.interimResults = true;
           speechRecognition.onresult = (event) => {
@@ -678,6 +679,18 @@ export function Chat() {
             setSpeechLog("onend");
             setRecording(false);
             if (speechRecognition) speechRecognition.stop();
+          };
+          speechRecognition.onsoundstart = () => {
+            setSpeechLog("onsoundstart");
+          };
+          speechRecognition.onsoundend = () => {
+            setSpeechLog("onsoundend");
+          };
+          speechRecognition.onaudioend = () => {
+            setSpeechLog("onaudioend");
+          };
+          speechRecognition.onspeechend = () => {
+            setSpeechLog("onspeechend");
           };
           speechRecognition.start();
         } else {
