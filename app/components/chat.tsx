@@ -603,6 +603,7 @@ export function Chat() {
   const [recording, setRecording] = useState(false);
   const [barding, setBarding] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
+  const [speechLog, setSpeechLog] = useState<string | null>(null);
 
   const onSpeechError = useCallback((e: any) => {
     setSpeechError(e.message);
@@ -610,6 +611,11 @@ export function Chat() {
       speechRecognition?.stop();
     } catch (e) {}
     setRecording(false);
+  }, []);
+  const onSpeechLog = useCallback((e: any) => {
+    setSpeechLog(e);
+    try {
+    } catch (e) {}
   }, []);
   const onSpeechStart = useCallback(async () => {
     let granted = false;
@@ -649,12 +655,12 @@ export function Chat() {
         setRecording(true);
         setSpeechRecognition();
         if (speechRecognition) {
-          console.log("speechrecognition true");
+          onSpeechLog("speechrecognition true");
           speechRecognition.lang = "zh-CN";
           speechRecognition.continuous = true;
           speechRecognition.interimResults = true;
           speechRecognition.onresult = (event) => {
-            console.log("onresult");
+            onSpeechLog("onresult");
             let transcript = "";
             if (
               event.results[event.results.length - 1].isFinal &&
@@ -669,7 +675,7 @@ export function Chat() {
             }
           };
           speechRecognition.onend = () => {
-            console.log("onend");
+            setSpeechLog({ msg: "onend" });
             setRecording(false);
             if (speechRecognition) speechRecognition.stop();
           };
@@ -695,6 +701,9 @@ export function Chat() {
   useEffect(() => {
     if (speechError) toast(speechError);
   }, [speechError]);
+  useEffect(() => {
+    if (speechLog) toast(speechLog);
+  }, [speechLog]);
 
   const findLastUserIndex = (messageId: number) => {
     // find last user input message and resend
