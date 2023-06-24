@@ -655,7 +655,24 @@ export function Chat() {
         setRecording(true);
         setSpeechRecognition();
         if (speechRecognition) {
-          onSpeechLog(("speechLog" + speechRecognition) as unknown as string);
+          navigator.mediaDevices
+            .getUserMedia({ audio: true })
+            .then((stream) => {
+              // Enumerate available audio input devices
+              const audioDevices = stream
+                .getAudioTracks()
+                .map((track) => track.getSettings().deviceId);
+
+              // Let the user choose which microphone to use
+              const selectedDeviceId = prompt(
+                `Select a microphone:\n\n${audioDevices.join("\n")}`,
+              );
+
+              // Set the chosen device as the source for speech recognition
+            })
+            .catch((error) => {
+              console.error(error);
+            });
           speechRecognition.lang = "zh-CN";
           // speechRecognition.maxAlternatives = 5;
           speechRecognition.continuous = true;
