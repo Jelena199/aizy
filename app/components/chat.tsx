@@ -612,11 +612,6 @@ export function Chat() {
     } catch (e) {}
     setRecording(false);
   }, []);
-  const onMobileLog = useCallback((e: any) => {
-    setSpeechLog(e);
-    try {
-    } catch (e) {}
-  }, []);
 
   const isMobileDevice = () =>
     typeof window.orientation !== "undefined" ||
@@ -630,16 +625,16 @@ export function Chat() {
       const result = await navigator.permissions.query({
         name: "microphone" as any,
       });
-      onMobileLog("result m" + result.state + result.name);
+      alert("result m" + result.state + result.name);
       if (result.state == "granted") {
         granted = true;
-        onMobileLog("granted1" + granted);
+        alert("granted1" + granted);
       } else if (result.state == "denied") {
         denied = true;
-        onMobileLog("denied1" + granted);
+        alert("denied1" + granted);
       }
     } catch (e) {
-      onMobileLog(("1 exception" + e) as string);
+      alert(("1 exception" + e) as string);
     }
 
     if (!granted && !denied) {
@@ -650,10 +645,10 @@ export function Chat() {
         });
         stream.getTracks().forEach((track) => track.stop());
         granted = true;
-        onMobileLog("granted2" + granted);
+        alert("granted2" + granted);
       } catch (e) {
         denied = true;
-        onMobileLog(("2 exception" + e) as string);
+        alert(("2 exception" + e) as string);
       }
     }
 
@@ -665,10 +660,10 @@ export function Chat() {
     try {
       if (!recording) {
         setRecording(true);
-        onMobileLog("1 recording");
+        alert("1 recording");
         setSpeechRecognition();
         if (speechRecognition) {
-          onMobileLog("1 speechrecognition");
+          alert("1 speechrecognition");
           speechRecognition.lang = "zh-CN";
           // speechRecognition.maxAlternatives = 5;
           speechRecognition.continuous = false; //!isMobileDevice();
@@ -688,7 +683,7 @@ export function Chat() {
             }
           };
           speechRecognition.onend = () => {
-            onMobileLog("end");
+            alert("end");
             setRecording(false);
             if (speechRecognition) speechRecognition.stop();
           };
