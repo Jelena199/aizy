@@ -633,6 +633,7 @@ export function Chat() {
       if (result.state == "granted") {
         granted = true;
         onMobileLog("granted1" + granted);
+        setRecording(false);
       } else if (result.state == "denied") {
         denied = true;
         onMobileLog("denied1" + granted);
