@@ -655,24 +655,6 @@ export function Chat() {
         setRecording(true);
         setSpeechRecognition();
         if (speechRecognition) {
-          navigator.mediaDevices
-            .getUserMedia({ audio: true })
-            .then((stream) => {
-              // Enumerate available audio input devices
-              const audioDevices = stream
-                .getAudioTracks()
-                .map((track) => track.getSettings().deviceId);
-
-              // Let the user choose which microphone to use
-              const selectedDeviceId = prompt(
-                `Select a microphone:\n\n${audioDevices.join("\n")}`,
-              );
-
-              // Set the chosen device as the source for speech recognition
-            })
-            .catch((error) => {
-              console.error(error);
-            });
           speechRecognition.lang = "zh-CN";
           // speechRecognition.maxAlternatives = 5;
           speechRecognition.continuous = true;
@@ -696,18 +678,6 @@ export function Chat() {
             setSpeechLog("onend");
             setRecording(false);
             if (speechRecognition) speechRecognition.stop();
-          };
-          speechRecognition.onsoundstart = () => {
-            setSpeechLog("onsoundstart");
-          };
-          speechRecognition.onsoundend = () => {
-            setSpeechLog("onsoundend");
-          };
-          speechRecognition.onaudioend = () => {
-            setSpeechLog("onaudioend");
-          };
-          speechRecognition.onspeechend = () => {
-            setSpeechLog("onspeechend");
           };
           speechRecognition.start();
         } else {
