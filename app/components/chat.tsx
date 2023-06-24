@@ -617,6 +617,11 @@ export function Chat() {
     try {
     } catch (e) {}
   }, []);
+
+  const isMobileDevice = () =>
+    typeof window.orientation !== "undefined" ||
+    navigator.userAgent.indexOf("IEMobile") !== -1;
+
   const onSpeechStart = useCallback(async () => {
     let granted = false;
     let denied = false;
@@ -657,7 +662,7 @@ export function Chat() {
         if (speechRecognition) {
           speechRecognition.lang = "zh-CN";
           // speechRecognition.maxAlternatives = 5;
-          speechRecognition.continuous = true;
+          speechRecognition.continuous = !isMobileDevice();
           speechRecognition.interimResults = true;
           speechRecognition.onresult = (event) => {
             let transcript = "";

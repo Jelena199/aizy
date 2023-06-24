@@ -125,14 +125,10 @@ declare global {
 let speechRecognition: SpeechRecognition | null = null;
 let supportsSpeechRecognition: boolean = true;
 
-const isMobileDevice = () =>
-  typeof window.orientation !== "undefined" ||
-  navigator.userAgent.indexOf("IEMobile") !== -1;
-
 const setSpeechRecognition = () => {
   let str: string = "";
-  if (window.SpeechRecognition || isMobileDevice()) {
-    str = "mobile";
+  if (window.SpeechRecognition) {
+    str = "mobile&speechrecognition";
     speechRecognition = new SpeechRecognition();
   } else if ((window as any).webkitSpeechRecognition) {
     str = "desktop";
