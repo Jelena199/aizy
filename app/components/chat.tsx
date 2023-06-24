@@ -612,7 +612,7 @@ export function Chat() {
     } catch (e) {}
     setRecording(false);
   }, []);
-  const onSpeechLog = useCallback((e: any) => {
+  const onMobileLog = useCallback((e: any) => {
     setSpeechLog(e);
     try {
     } catch (e) {}
@@ -632,10 +632,14 @@ export function Chat() {
       });
       if (result.state == "granted") {
         granted = true;
+        onMobileLog("granted1" + granted);
       } else if (result.state == "denied") {
         denied = true;
+        onMobileLog("denied1" + granted);
       }
-    } catch (e) {}
+    } catch (e) {
+      onMobileLog(("1 exception" + e) as string);
+    }
 
     if (!granted && !denied) {
       try {
@@ -645,8 +649,10 @@ export function Chat() {
         });
         stream.getTracks().forEach((track) => track.stop());
         granted = true;
+        onMobileLog("granted2" + granted);
       } catch (e) {
         denied = true;
+        onMobileLog(("2 exception" + e) as string);
       }
     }
 
@@ -658,8 +664,9 @@ export function Chat() {
     try {
       if (!recording) {
         setRecording(true);
-        onSpeechLog(setSpeechRecognition());
+        onMobileLog("1 recording");
         if (speechRecognition) {
+          onMobileLog("1 speechrecognition");
           speechRecognition.lang = "zh-CN";
           // speechRecognition.maxAlternatives = 5;
           speechRecognition.continuous = !isMobileDevice();
@@ -679,6 +686,7 @@ export function Chat() {
             }
           };
           speechRecognition.onend = () => {
+            onMobileLog("end");
             setRecording(false);
             if (speechRecognition) speechRecognition.stop();
           };
@@ -688,8 +696,8 @@ export function Chat() {
         }
       } else {
         if (speechRecognition) {
-          setRecording(false);
           speechRecognition.stop();
+          setRecording(false);
         } else {
           setRecording(false);
           onSpeechError(new Error("not supported"));
