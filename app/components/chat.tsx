@@ -612,11 +612,6 @@ export function Chat() {
     } catch (e) {}
     setRecording(false);
   }, []);
-  const onSpeechLog = useCallback((e: any) => {
-    setSpeechLog(e);
-    try {
-    } catch (e) {}
-  }, []);
   const onSpeechStart = useCallback(async () => {
     let granted = false;
     let denied = false;
@@ -660,7 +655,6 @@ export function Chat() {
           speechRecognition.continuous = true;
           speechRecognition.interimResults = true;
           speechRecognition.onresult = (event) => {
-            onSpeechLog("onresult");
             let transcript = "";
             if (
               event.results[event.results.length - 1].isFinal &&
@@ -675,7 +669,6 @@ export function Chat() {
             }
           };
           speechRecognition.onend = () => {
-            setSpeechLog("onend");
             setRecording(false);
             if (speechRecognition) speechRecognition.stop();
           };

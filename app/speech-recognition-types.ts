@@ -127,8 +127,10 @@ let supportsSpeechRecognition: boolean = true;
 
 const setSpeechRecognition = () => {
   if (window.SpeechRecognition) {
+    console.log("mobile?");
     speechRecognition = new SpeechRecognition();
   } else if ((window as any).webkitSpeechRecognition) {
+    console.log("desktop?");
     speechRecognition = new (
       window as any
     ).webkitSpeechRecognition() as SpeechRecognition;
