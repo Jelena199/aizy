@@ -675,7 +675,7 @@ export function Chat() {
             }
           };
           speechRecognition.onend = () => {
-            setSpeechLog({ msg: "onend" });
+            setSpeechLog("onend");
             setRecording(false);
             if (speechRecognition) speechRecognition.stop();
           };
