@@ -630,10 +630,10 @@ export function Chat() {
       const result = await navigator.permissions.query({
         name: "microphone" as any,
       });
+      onMobileLog("result m" + result.state + result.name);
       if (result.state == "granted") {
         granted = true;
         onMobileLog("granted1" + granted);
-        setRecording(false);
       } else if (result.state == "denied") {
         denied = true;
         onMobileLog("denied1" + granted);
@@ -671,8 +671,8 @@ export function Chat() {
           onMobileLog("1 speechrecognition");
           speechRecognition.lang = "zh-CN";
           // speechRecognition.maxAlternatives = 5;
-          speechRecognition.continuous = !isMobileDevice();
-          speechRecognition.interimResults = true;
+          speechRecognition.continuous = false; //!isMobileDevice();
+          speechRecognition.interimResults = false;
           speechRecognition.onresult = (event) => {
             let transcript = "";
             if (
