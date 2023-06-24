@@ -612,6 +612,11 @@ export function Chat() {
     } catch (e) {}
     setRecording(false);
   }, []);
+  const onSpeechLog = useCallback((e: any) => {
+    setSpeechLog(e);
+    try {
+    } catch (e) {}
+  }, []);
   const onSpeechStart = useCallback(async () => {
     let granted = false;
     let denied = false;
@@ -648,7 +653,7 @@ export function Chat() {
     try {
       if (!recording) {
         setRecording(true);
-        setSpeechRecognition();
+        onSpeechLog(setSpeechRecognition());
         if (speechRecognition) {
           speechRecognition.lang = "zh-CN";
           // speechRecognition.maxAlternatives = 5;
