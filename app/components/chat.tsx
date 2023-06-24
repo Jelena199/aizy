@@ -649,10 +649,12 @@ export function Chat() {
         setRecording(true);
         setSpeechRecognition();
         if (speechRecognition) {
-          if (speechRecognition) speechRecognition.lang = "zh-CN";
+          console.log("speechrecognition true");
+          speechRecognition.lang = "zh-CN";
           speechRecognition.continuous = true;
           speechRecognition.interimResults = true;
           speechRecognition.onresult = (event) => {
+            console.log("onresult");
             let transcript = "";
             if (
               event.results[event.results.length - 1].isFinal &&
@@ -667,6 +669,7 @@ export function Chat() {
             }
           };
           speechRecognition.onend = () => {
+            console.log("onend");
             setRecording(false);
             if (speechRecognition) speechRecognition.stop();
           };
@@ -954,7 +957,7 @@ export function Chat() {
                         (message.preview || message.content.length === 0) &&
                         !isUser
                       }
-                      onContextMenu={(e) => onRightClick(e, message)}
+                      onContextMenu={(e: any) => onRightClick(e, message)}
                       onDoubleClickCapture={() => {
                         if (!isMobileScreen) return;
                         setUserInput(message.content);
