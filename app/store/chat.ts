@@ -287,9 +287,8 @@ export const useChatStore = create<ChatStore>()(
         console.log("[User Input] ", sendMessages, voice);
         if (barding) {
           try {
-            const bard = new Bard(
-              "XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.",
-            );
+            const bard = new Bard(prompt(`Input your Bard key`) as string);
+            // "XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.",
             console.log("bard starting");
             const message = await bard.query(
               "sendMessages[sendMessages.length - 1].content",
@@ -313,68 +312,8 @@ export const useChatStore = create<ChatStore>()(
               sessionIndex,
               botMessage.id ?? messageIndex,
             );
-            set(() => ({}));
           } catch (e) {
-            api.llm.chat({
-              messages: sendMessages,
-              config: { ...modelConfig, stream: !voice },
-              onUpdate(message) {
-                botMessage.streaming = !voice;
-                if (message) {
-                  botMessage.content = message;
-                }
-              },
-              onFinish(message) {
-                botMessage.streaming = false;
-                if (message) {
-                  botMessage.content = message;
-                  if (voice) {
-                    if ("speechSynthesis" in window) {
-                      console.log("speechSynthesis");
-                      doSpeechSynthesis(message, onSpeechStart);
-                      console.log("finished speechSynthesis");
-                    } else {
-                      console.log("not support speechSynthesis");
-                      throw "Does not support speechSynthesis";
-                    }
-                  }
-                  get().onNewMessage(botMessage);
-                }
-                ChatControllerPool.remove(
-                  sessionIndex,
-                  botMessage.id ?? messageIndex,
-                );
-                set(() => ({}));
-              },
-              onError(error) {
-                const isAborted = error.message.includes("aborted");
-                botMessage.content =
-                  "\n\n" +
-                  prettyObject({
-                    error: true,
-                    message: error.message,
-                  });
-                botMessage.streaming = false;
-                userMessage.isError = !isAborted;
-                botMessage.isError = !isAborted;
-
-                set(() => ({}));
-                ChatControllerPool.remove(
-                  sessionIndex,
-                  botMessage.id ?? messageIndex,
-                );
-
-                console.error("[Chat] failed ", error);
-              },
-              onController(controller) {
-                // collect controller for stop/retry
-                ChatControllerPool.addController(
-                  sessionIndex,
-                  botMessage.id ?? messageIndex,
-                  controller,
-                );
-              },
-            });
+            console.log(e);
           }
         } else {
           api.llm.chat({
