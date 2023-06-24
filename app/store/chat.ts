@@ -314,7 +314,29 @@ export const useChatStore = create<ChatStore>()(
             );
           } catch (e) {
             console.log(e);
+            botMessage.streaming = false;
+            botMessage.content =
+              "Google Bard is not enabled: check your key please...";
+            if (voice) {
+              if ("speechSynthesis" in window) {
+                console.log("speechSynthesis");
+                doSpeechSynthesis(
+                  "Google Bard is not enabled: check your key please...",
+                  onSpeechStart,
+                );
+                console.log("finished speechSynthesis");
+              } else {
+                console.log("not support speechSynthesis");
+                throw "Does not support speechSynthesis";
+              }
+            }
+            get().onNewMessage(botMessage);
           }
+          ChatControllerPool.remove(
+            sessionIndex,
+            botMessage.id ?? messageIndex,
+          );
+          set(() => ({}));
         } else {
           api.llm.chat({
             messages: sendMessages,
