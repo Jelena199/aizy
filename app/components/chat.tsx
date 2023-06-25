@@ -688,7 +688,6 @@ export function Chat() {
             if (speechRecognition) speechRecognition.stop();
           };
           speechRecognition.start();
-          speechRecognition.start();
         } else {
           onSpeechError(new Error("1not supported"));
         }
