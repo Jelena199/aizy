@@ -135,7 +135,7 @@ const setSpeechRecognition = () => {
   if (window.SpeechRecognition && !isMobileDevice()) {
     str = "mobile&speechrecognition";
     speechRecognition = new SpeechRecognition();
-  } else if (window.SpeechRecognition) {
+  } else if (isMobileDevice()) {
     str = "mobile&speechly";
     const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(
       "1c6b9766-e710-4f7a-93de-35c867a00b2a",
