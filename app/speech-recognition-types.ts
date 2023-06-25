@@ -1,3 +1,4 @@
+import { createSpeechlySpeechRecognition } from "@speechly/speech-recognition-polyfill";
 declare global {
   interface Window {
     SpeechRecognition: SpeechRecognition;
@@ -125,11 +126,21 @@ declare global {
 let speechRecognition: SpeechRecognition | null = null;
 let supportsSpeechRecognition: boolean = true;
 
+const isMobileDevice = () =>
+  typeof window.orientation !== "undefined" ||
+  navigator.userAgent.indexOf("IEMobile") !== -1;
+
 const setSpeechRecognition = () => {
   let str: string = "";
-  if (window.SpeechRecognition) {
+  if (window.SpeechRecognition && !isMobileDevice()) {
     str = "mobile&speechrecognition";
     speechRecognition = new SpeechRecognition();
+  } else if (window.SpeechRecognition) {
+    const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(
+      "1c6b9766-e710-4f7a-93de-35c867a00b2a",
+    );
+    speechRecognition =
+      new SpeechlySpeechRecognition() as unknown as SpeechRecognition;
   } else if ((window as any).webkitSpeechRecognition) {
     str = "desktop";
     speechRecognition = new (

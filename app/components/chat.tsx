@@ -613,10 +613,6 @@ export function Chat() {
     setRecording(false);
   }, []);
 
-  const isMobileDevice = () =>
-    typeof window.orientation !== "undefined" ||
-    navigator.userAgent.indexOf("IEMobile") !== -1;
-
   const onSpeechStart = useCallback(async () => {
     let granted = false;
     let denied = false;
