@@ -621,16 +621,13 @@ export function Chat() {
       const result = await navigator.permissions.query({
         name: "microphone" as any,
       });
-      alert("result m" + result.state + result.name);
       if (result.state == "granted") {
         granted = true;
-        alert("granted1" + granted);
       } else if (result.state == "denied") {
         denied = true;
-        alert("denied1" + granted);
       }
     } catch (e) {
-      alert(("1 exception" + e) as string);
+      console.log(e);
     }
 
     if (!granted && !denied) {
@@ -641,10 +638,8 @@ export function Chat() {
         });
         stream.getTracks().forEach((track) => track.stop());
         granted = true;
-        alert("granted2" + granted);
       } catch (e) {
         denied = true;
-        alert(("2 exception" + e) as string);
       }
     }
 
@@ -655,11 +650,7 @@ export function Chat() {
 
     try {
       if (!recording) {
-        setRecording(true);
-        alert("1 recording");
-        alert(setSpeechRecognition());
         if (speechRecognition) {
-          alert("1 speechrecognition");
           speechRecognition.lang = "en-US";
           speechRecognition.interimResults = false;
           speechRecognition.continuous = false;
@@ -677,14 +668,10 @@ export function Chat() {
               doSubmit(transcript, true);
             }
           };
-          speechRecognition.onsoundend = (event) => {
-            alert("soundend");
-          };
-          speechRecognition.onsoundstart = (event) => {
-            alert("soundend");
+          speechRecognition.onstart = () => {
+            setRecording(true);
           };
           speechRecognition.onend = () => {
-            alert("end");
             setRecording(false);
             if (speechRecognition) speechRecognition.stop();
           };
