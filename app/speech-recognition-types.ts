@@ -138,7 +138,7 @@ const setSpeechRecognition = () => {
   } else if (isMobileDevice()) {
     str = "mobile&speechly";
     const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(
-      "ea741412-97ea-49c3-82cb-1a3b2bf8c740",
+      "8314d0ea-9393-4721-a229-a46b3114cf92",
     );
     speechRecognition =
       new SpeechlySpeechRecognition() as unknown as SpeechRecognition;
