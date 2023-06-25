@@ -666,8 +666,8 @@ export function Chat() {
           alert("1 speechrecognition");
           speechRecognition.lang = "zh-CN";
           // speechRecognition.maxAlternatives = 5;
-          speechRecognition.continuous = false; //!isMobileDevice();
-          speechRecognition.interimResults = false;
+          // speechRecognition.continuous = false; //!isMobileDevice();
+          speechRecognition.interimResults = true;
           speechRecognition.onresult = (event) => {
             let transcript = "";
             if (
