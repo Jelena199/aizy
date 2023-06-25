@@ -658,7 +658,6 @@ export function Chat() {
           speechRecognition.maxAlternatives = 1;
           speechRecognition.onresult = (event) => {
             let transcript = "";
-            alert("result");
             if (
               event.results[event.results.length - 1].isFinal &&
               event.results[event.results.length - 1][0].confidence
