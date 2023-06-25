@@ -680,6 +680,9 @@ export function Chat() {
           speechRecognition.onsoundend = (event) => {
             alert("soundend");
           };
+          speechRecognition.onsoundstart = (event) => {
+            alert("soundend");
+          };
           speechRecognition.onend = () => {
             alert("end");
             setRecording(false);
