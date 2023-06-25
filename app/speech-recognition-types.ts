@@ -126,22 +126,11 @@ declare global {
 let speechRecognition: SpeechRecognition | null = null;
 let supportsSpeechRecognition: boolean = true;
 
-const isMobileDevice = () =>
-  typeof window.orientation !== "undefined" ||
-  navigator.userAgent.indexOf("IEMobile") !== -1;
-
 const setSpeechRecognition = () => {
   let str: string = "";
-  if (window.SpeechRecognition && !isMobileDevice()) {
+  if (window.SpeechRecognition) {
     str = "mobile&speechrecognition";
     speechRecognition = new SpeechRecognition();
-  } else if (isMobileDevice()) {
-    str = "mobile&speechly";
-    const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(
-      "ea741412-97ea-49c3-82cb-1a3b2bf8c740",
-    );
-    speechRecognition =
-      new SpeechlySpeechRecognition() as unknown as SpeechRecognition;
   } else if ((window as any).webkitSpeechRecognition) {
     str = "desktop";
     speechRecognition = new (

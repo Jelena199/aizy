@@ -660,7 +660,7 @@ export function Chat() {
         alert(setSpeechRecognition());
         if (speechRecognition) {
           alert("1 speechrecognition");
-          speechRecognition.lang = "zh-CN";
+          speechRecognition.lang = "en-US";
           speechRecognition.interimResults = true;
           speechRecognition.onresult = (event) => {
             let transcript = "";
