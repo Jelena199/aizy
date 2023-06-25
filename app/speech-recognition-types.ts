@@ -126,14 +126,18 @@ let speechRecognition: SpeechRecognition | null = null;
 let supportsSpeechRecognition: boolean = true;
 
 const setSpeechRecognition = () => {
+  let str: string = "";
   if (window.SpeechRecognition) {
+    str = "mobile&speechrecognition";
     speechRecognition = new SpeechRecognition();
   } else if ((window as any).webkitSpeechRecognition) {
+    str = "desktop";
     speechRecognition = new (
       window as any
     ).webkitSpeechRecognition() as SpeechRecognition;
   }
   supportsSpeechRecognition = speechRecognition !== null;
+  return str;
 };
 
 export { speechRecognition, supportsSpeechRecognition, setSpeechRecognition };

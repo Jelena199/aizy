@@ -603,6 +603,7 @@ export function Chat() {
   const [recording, setRecording] = useState(false);
   const [barding, setBarding] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
+  const [speechLog, setSpeechLog] = useState<string | null>(null);
 
   const onSpeechError = useCallback((e: any) => {
     setSpeechError(e.message);
@@ -611,6 +612,7 @@ export function Chat() {
     } catch (e) {}
     setRecording(false);
   }, []);
+
   const onSpeechStart = useCallback(async () => {
     let granted = false;
     let denied = false;
@@ -624,7 +626,9 @@ export function Chat() {
       } else if (result.state == "denied") {
         denied = true;
       }
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
 
     if (!granted && !denied) {
       try {
@@ -646,12 +650,12 @@ export function Chat() {
 
     try {
       if (!recording) {
-        setRecording(true);
         setSpeechRecognition();
         if (speechRecognition) {
-          if (speechRecognition) speechRecognition.lang = "zh-CN";
-          speechRecognition.continuous = true;
-          speechRecognition.interimResults = true;
+          speechRecognition.lang = "en-US";
+          speechRecognition.interimResults = false;
+          speechRecognition.continuous = false;
+          speechRecognition.maxAlternatives = 1;
           speechRecognition.onresult = (event) => {
             let transcript = "";
             if (
@@ -661,10 +665,12 @@ export function Chat() {
               transcript +=
                 event.results[event.results.length - 1][0].transcript;
             }
-            if (inputRef.current) inputRef.current.value += transcript;
-            if (transcript != "") {
+            if (/*transcript != ""*/ 1) {
               doSubmit(transcript, true);
             }
+          };
+          speechRecognition.onstart = () => {
+            setRecording(true);
           };
           speechRecognition.onend = () => {
             setRecording(false);
@@ -672,15 +678,15 @@ export function Chat() {
           };
           speechRecognition.start();
         } else {
-          onSpeechError(new Error("not supported"));
+          onSpeechError(new Error("1not supported"));
         }
       } else {
         if (speechRecognition) {
-          setRecording(false);
           speechRecognition.stop();
+          setRecording(false);
         } else {
           setRecording(false);
-          onSpeechError(new Error("not supported"));
+          onSpeechError(new Error("2not supported"));
         }
       }
     } catch (e) {
@@ -692,6 +698,9 @@ export function Chat() {
   useEffect(() => {
     if (speechError) toast(speechError);
   }, [speechError]);
+  useEffect(() => {
+    if (speechLog) toast(speechLog);
+  }, [speechLog]);
 
   const findLastUserIndex = (messageId: number) => {
     // find last user input message and resend
@@ -954,7 +963,7 @@ export function Chat() {
                         (message.preview || message.content.length === 0) &&
                         !isUser
                       }
-                      onContextMenu={(e) => onRightClick(e, message)}
+                      onContextMenu={(e: any) => onRightClick(e, message)}
                       onDoubleClickCapture={() => {
                         if (!isMobileScreen) return;
                         setUserInput(message.content);
