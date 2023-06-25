@@ -650,6 +650,7 @@ export function Chat() {
 
     try {
       if (!recording) {
+        setSpeechRecognition();
         if (speechRecognition) {
           speechRecognition.lang = "en-US";
           speechRecognition.interimResults = false;
