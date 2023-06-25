@@ -522,18 +522,16 @@ export function Chat() {
   const doSubmit = (userInput: string, voiceMode: boolean) => {
     if (userInput.trim() === "") return;
     setIsLoading(true);
-    chatStore
-      .onUserInput(userInput, voiceMode, barding, onSpeechStart)
-      .then(() => {
-        setIsLoading(false);
-        if (speechRecognition) {
-          setRecording(false);
-          speechRecognition.stop();
-        } else {
-          setRecording(false);
-          onSpeechError(new Error("not supported"));
-        }
-      });
+    chatStore.onUserInput(userInput, true, barding, onSpeechStart).then(() => {
+      setIsLoading(false);
+      if (speechRecognition) {
+        setRecording(false);
+        speechRecognition.stop();
+      } else {
+        setRecording(false);
+        onSpeechError(new Error("not supported"));
+      }
+    });
     localStorage.setItem(LAST_INPUT_KEY, userInput);
     setUserInput("");
     setPromptHints([]);
