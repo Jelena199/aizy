@@ -657,7 +657,7 @@ export function Chat() {
       if (!recording) {
         setRecording(true);
         alert("1 recording");
-        setSpeechRecognition();
+        alert(setSpeechRecognition());
         if (speechRecognition) {
           alert("1 speechrecognition");
           speechRecognition.lang = "zh-CN";
