@@ -650,7 +650,7 @@ export function Chat() {
       if (!recording) {
         setSpeechRecognition();
         if (speechRecognition) {
-          speechRecognition.lang = "en-US";
+          speechRecognition.lang = "zh-CN";
           speechRecognition.interimResults = false;
           speechRecognition.continuous = false;
           speechRecognition.maxAlternatives = 1;
