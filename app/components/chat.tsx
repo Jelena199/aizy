@@ -661,7 +661,9 @@ export function Chat() {
         if (speechRecognition) {
           alert("1 speechrecognition");
           speechRecognition.lang = "en-US";
-          speechRecognition.interimResults = true;
+          speechRecognition.interimResults = false;
+          speechRecognition.continuous = false;
+          speechRecognition.maxAlternatives = 1;
           speechRecognition.onresult = (event) => {
             let transcript = "";
             if (

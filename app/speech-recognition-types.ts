@@ -1,4 +1,3 @@
-import { createSpeechlySpeechRecognition } from "@speechly/speech-recognition-polyfill";
 declare global {
   interface Window {
     SpeechRecognition: SpeechRecognition;
