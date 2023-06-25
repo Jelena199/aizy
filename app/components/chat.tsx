@@ -677,6 +677,9 @@ export function Chat() {
               doSubmit(transcript, true);
             }
           };
+          speechRecognition.onsoundend = (event) => {
+            alert("soundend");
+          };
           speechRecognition.onend = () => {
             alert("end");
             setRecording(false);
