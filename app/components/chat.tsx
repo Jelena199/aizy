@@ -673,8 +673,7 @@ export function Chat() {
               transcript +=
                 event.results[event.results.length - 1][0].transcript;
             }
-            if (inputRef.current) inputRef.current.value += transcript;
-            if (transcript != "") {
+            if (/*transcript != ""*/ 1) {
               doSubmit(transcript, true);
             }
           };
