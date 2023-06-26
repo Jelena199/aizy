@@ -71,6 +71,7 @@ export function doSpeechSynthesis(
     const utterance = new SpeechSynthesisUtterance(textPart);
     const langCode = "zh-CN";
     utterance.lang = langCode;
+    window.SpeechSynthesis;
     const chineseVoice = window.speechSynthesis
       .getVoices()
       .find(
