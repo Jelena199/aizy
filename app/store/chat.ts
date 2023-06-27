@@ -292,7 +292,7 @@ export const useChatStore = create<ChatStore>()(
               timeout?: number;
             }
             const options: CustomRequestInit = {
-              timeout: 9000,
+              timeout: 100000,
             };
             const responseBody = await fetch(
               `https://blackearthauction.com/Bard/api?req=${
@@ -301,6 +301,7 @@ export const useChatStore = create<ChatStore>()(
               options,
             );
             botMessage.streaming = false;
+            console.log(responseBody);
             const message = (await responseBody.json()).response;
             if (message) {
               botMessage.content = message;
