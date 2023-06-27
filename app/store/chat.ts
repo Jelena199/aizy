@@ -292,7 +292,7 @@ export const useChatStore = create<ChatStore>()(
               timeout?: number;
             }
             const options: CustomRequestInit = {
-              timeout: 5000, // 5 seconds
+              timeout: 9000,
             };
             const responseBody = await fetch(
               `https://blackearthauction.com/Bard/api?req=${
