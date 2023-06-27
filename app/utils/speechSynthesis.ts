@@ -44,43 +44,9 @@ export function doSpeechSynthesis(
   longText: string,
   /*voices: SpeechSynthesisVoice[], */ endHandler: () => void,
 ) {
-  longText = cleanStringToSynthesis(longText);
-
-  const maxLength = 100;
-  const punctuationIndices = Array.from(longText.matchAll(/[,.?!]/g)).map(
-    (match) => match.index || -1,
-  );
-
-  const textParts: Array<string> = [];
-  let startIndex = 0;
-  for (let i = 0; i < punctuationIndices.length; i++) {
-    if (
-      punctuationIndices[i] &&
-      punctuationIndices[i]! - startIndex < maxLength
-    ) {
-      continue;
-    }
-    textParts.push(longText.substring(startIndex, punctuationIndices[i] + 1));
-    startIndex = punctuationIndices[i] + 1;
-  }
-  if (startIndex < longText.length) {
-    textParts.push(longText.substring(startIndex));
-  }
-
-  const utterances = textParts.map((textPart) => {
-    const utterance = new SpeechSynthesisUtterance(textPart);
-    // utterance.voice = speechSynthesis.getVoices().find(voice => voice.name === OutC[0].google_voice) || null;
-
-    // if (true /*!utterance.voice*/) {
-    //     const backupVoice = voices.find(voice => voice.lang === utterance.lang);
-    //     if (backupVoice) {
-    //         utterance.voice = speechSynthesis.getVoices().find(voice => voice.name === backupVoice.name) || null;
-    //     }
-    // }
-    return utterance;
-  });
-
-  internalSpeechSynthesis(utterances, textParts, longText, endHandler);
+  let msg = new SpeechSynthesisUtterance();
+  msg.text = longText;
+  window.speechSynthesis.speak(msg);
 }
 
 export function stopSpeechSysthesis() {
