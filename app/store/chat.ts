@@ -283,17 +283,18 @@ export const useChatStore = create<ChatStore>()(
           session.messages.push(botMessage);
         });
 
-        // make request XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w
+        // make request XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.
         console.log("[User Input] ", sendMessages, voice);
         if (barding) {
           try {
-            const bard = new Bard(prompt(`Input your Bard key`) as string);
-            // "XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.",
             console.log("bard starting");
-            const message = await bard.query(
-              "sendMessages[sendMessages.length - 1].content",
+            const responseBody = await fetch(
+              `https://blackearthauction.com/Bard/api?req=${
+                sendMessages[sendMessages.length - 1].content
+              }&token=XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.`,
             );
             botMessage.streaming = false;
+            const message = (await responseBody.json()).response;
             if (message) {
               botMessage.content = message;
               if (voice) {
