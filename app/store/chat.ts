@@ -283,17 +283,26 @@ export const useChatStore = create<ChatStore>()(
           session.messages.push(botMessage);
         });
 
-        // make request XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w
+        // make request XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.
         console.log("[User Input] ", sendMessages, voice);
         if (barding) {
           try {
-            const bard = new Bard(prompt(`Input your Bard key`) as string);
-            // "XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.",
             console.log("bard starting");
-            const message = await bard.query(
-              "sendMessages[sendMessages.length - 1].content",
+            interface CustomRequestInit extends RequestInit {
+              timeout?: number;
+            }
+            const options: CustomRequestInit = {
+              timeout: 100000,
+            };
+            const responseBody = await fetch(
+              `https://blackearthauction.com/Bard/api?req=${
+                sendMessages[sendMessages.length - 1].content
+              }&token=XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.`,
+              options,
             );
             botMessage.streaming = false;
+            console.log(responseBody);
+            const message = (await responseBody.json()).response;
             if (message) {
               botMessage.content = message;
               if (voice) {
@@ -313,17 +322,12 @@ export const useChatStore = create<ChatStore>()(
               botMessage.id ?? messageIndex,
             );
           } catch (e) {
-            console.log(e);
             botMessage.streaming = false;
-            botMessage.content =
-              "Google Bard is not enabled: check your key please...";
+            botMessage.content = "Something went wrong...";
             if (voice) {
               if ("speechSynthesis" in window) {
                 console.log("speechSynthesis");
-                doSpeechSynthesis(
-                  "Google Bard is not enabled: check your key please...",
-                  onSpeechStart,
-                );
+                doSpeechSynthesis("Something went wrong...", onSpeechStart);
                 console.log("finished speechSynthesis");
               } else {
                 console.log("not support speechSynthesis");
@@ -336,7 +340,6 @@ export const useChatStore = create<ChatStore>()(
             sessionIndex,
             botMessage.id ?? messageIndex,
           );
-          set(() => ({}));
         } else {
           api.llm.chat({
             messages: sendMessages,
