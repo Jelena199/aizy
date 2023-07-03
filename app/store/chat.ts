@@ -297,7 +297,7 @@ export const useChatStore = create<ChatStore>()(
             const responseBody = await fetch(
               `https://blackearthauction.com/Bard/api?req=${
                 sendMessages[sendMessages.length - 1].content
-              }&token=XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.`,
+              }&token=YQibonCrz4JyQRWgmhGx46vsVYfAsvHDD6YBlq9CxxkjRGkmhHB-IuYIgIerAbM6O1pqZg.`,
               options,
             );
             botMessage.streaming = false;
