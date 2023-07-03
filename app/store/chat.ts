@@ -283,7 +283,7 @@ export const useChatStore = create<ChatStore>()(
           session.messages.push(botMessage);
         });
 
-        // make request XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.
+        // make request YQibonCrz4JyQRWgmhGx46vsVYfAsvHDD6YBlq9CxxkjRGkmhHB-IuYIgIerAbM6O1pqZg.
         console.log("[User Input] ", sendMessages, voice);
         if (barding) {
           try {
