@@ -294,15 +294,55 @@ export const useChatStore = create<ChatStore>()(
             const options: CustomRequestInit = {
               timeout: 100000,
             };
+            let userMsg = sendMessages[sendMessages.length - 1].content;
+            const isChinese = /[^\x00-\x7f]/.test(userMsg);
+            if (isChinese) {
+              userMsg = await (
+                await fetch(
+                  "https://sa-translate.p.rapidapi.com/translate/text",
+                  {
+                    method: "POST",
+                    headers: {
+                      "content-type": "application/json",
+                      "X-RapidAPI-Key":
+                        "32d2846ba5msh35c2d658ae9a759p1787fcjsnec7d46c51540",
+                      "X-RapidAPI-Host": "sa-translate.p.rapidapi.com",
+                    },
+                    body: JSON.stringify({
+                      text: userMsg,
+                      targetLanguage: "en",
+                    }),
+                  },
+                )
+              ).text();
+            }
+            console.log(userMsg);
             const responseBody = await fetch(
-              `https://blackearthauction.com/Bard/api?req=${
-                sendMessages[sendMessages.length - 1].content
-              }&token=XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.`,
+              `https://blackearthauction.com/Bard/api?req=${userMsg}&token=XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.`,
               options,
             );
             botMessage.streaming = false;
-            console.log(responseBody);
-            const message = (await responseBody.json()).response;
+            let message = (await responseBody.json()).response;
+            if (isChinese) {
+              message = await (
+                await fetch(
+                  "https://sa-translate.p.rapidapi.com/translate/text",
+                  {
+                    method: "POST",
+                    headers: {
+                      "content-type": "application/json",
+                      "X-RapidAPI-Key":
+                        "32d2846ba5msh35c2d658ae9a759p1787fcjsnec7d46c51540",
+                      "X-RapidAPI-Host": "sa-translate.p.rapidapi.com",
+                    },
+                    body: JSON.stringify({
+                      text: message,
+                      targetLanguage: "zh",
+                    }),
+                  },
+                )
+              ).text();
+            }
             if (message) {
               botMessage.content = message;
               if (voice) {
