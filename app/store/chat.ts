@@ -318,7 +318,7 @@ export const useChatStore = create<ChatStore>()(
             }
             console.log(userMsg);
             const responseBody = await fetch(
-              `https://blackearthauction.com/Bard/api?req=${userMsg}&token=XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.`,
+              `https://blackearthauction.com/Bard/api?req=${userMsg}&token=YQibonCrz4JyQRWgmhGx46vsVYfAsvHDD6YBlq9CxxkjRGkmhHB-IuYIgIerAbM6O1pqZg.`,
               options,
             );
             botMessage.streaming = false;
