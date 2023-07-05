@@ -283,7 +283,7 @@ export const useChatStore = create<ChatStore>()(
           session.messages.push(botMessage);
         });
 
-        // make request YQibonCrz4JyQRWgmhGx46vsVYfAsvHDD6YBlq9CxxkjRGkmhHB-IuYIgIerAbM6O1pqZg.
+        // make request XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.
         console.log("[User Input] ", sendMessages, voice);
         if (barding) {
           try {
@@ -297,7 +297,7 @@ export const useChatStore = create<ChatStore>()(
             const responseBody = await fetch(
               `https://blackearthauction.com/Bard/api?req=${
                 sendMessages[sendMessages.length - 1].content
-              }&token=YQibonCrz4JyQRWgmhGx46vsVYfAsvHDD6YBlq9CxxkjRGkmhHB-IuYIgIerAbM6O1pqZg.`,
+              }&token=XQibomTAv5xhIyJR3MY1SdBuo3awxgoQVZRSkc7BVsYR00XwepudoEa6K8nAOdnTbC9Z3w.`,
               options,
             );
             botMessage.streaming = false;

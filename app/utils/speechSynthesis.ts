@@ -1,3 +1,5 @@
+import langdetect from "langdetect";
+
 export function cleanStringToSynthesis(str: string) {
   str = str
     .trim()
@@ -23,6 +25,7 @@ function internalSpeechSynthesis(
       const textToHighlight = textParts[index];
       const highlightIndex = longText.indexOf(textToHighlight);
 
+      /[^\x00-\x7f]/.test(utterances[index].text) ? "zh-CN" : "en-US";
       // Speak the text
       speechSynthesis.speak(utterances[index]);
       utterances[index].addEventListener("end", () => {
