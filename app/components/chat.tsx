@@ -31,6 +31,8 @@ import MicrophoneIcon from "../icons/microphone.svg";
 import MicrophoneOffIcon from "../icons/microphone_off.svg";
 import GoogleBardIcon from "../icons/google-bard-on.svg";
 import GoogleBardOffIcon from "../icons/google-bard-off.svg";
+import ChineseIcon from "../icons/chinese.svg";
+import EnglishIcon from "../icons/english.svg";
 
 import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
@@ -324,9 +326,11 @@ export function ChatActions(props: {
   showPromptHints: () => void;
   onSpeechStart: () => void;
   onBarding: () => void;
+  onChinese: () => void;
   hitBottom: boolean;
   recording: boolean;
   barding: boolean;
+  chinese: boolean;
 }) {
   const config = useAppConfig();
   const navigate = useNavigate();
@@ -431,6 +435,13 @@ export function ChatActions(props: {
         onClick={props.onBarding}
       >
         {props.barding ? <GoogleBardIcon /> : <GoogleBardOffIcon />}
+      </div>
+
+      <div
+        className={`${chatStyle["chat-input-action"]} clickable`}
+        onClick={props.onChinese}
+      >
+        {props.chinese ? <ChineseIcon /> : <EnglishIcon />}
       </div>
     </div>
   );
@@ -602,6 +613,7 @@ export function Chat() {
 
   const [recording, setRecording] = useState(false);
   const [barding, setBarding] = useState(false);
+  const [chinese, setChinese] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
   const [speechLog, setSpeechLog] = useState<string | null>(null);
 
@@ -655,6 +667,7 @@ export function Chat() {
           speechRecognition.interimResults = false;
           speechRecognition.continuous = false;
           speechRecognition.maxAlternatives = 1;
+          speechRecognition.lang = chinese ? "zh-CN" : "en-US";
           speechRecognition.onresult = (event) => {
             let transcript = "";
             if (
@@ -996,6 +1009,7 @@ export function Chat() {
           hitBottom={hitBottom}
           recording={recording}
           barding={barding}
+          chinese={chinese}
           showPromptHints={() => {
             // Click again to close
             if (promptHints.length > 0) {
@@ -1009,6 +1023,7 @@ export function Chat() {
           }}
           onSpeechStart={onSpeechStart}
           onBarding={() => setBarding(!barding)}
+          onChinese={() => setChinese(!chinese)}
         />
         <div className={styles["chat-input-panel-inner"]}>
           <textarea
