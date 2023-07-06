@@ -388,6 +388,8 @@ export const useChatStore = create<ChatStore>()(
             const anthropic = new Anthropic({
               apiKey:
                 "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",
+              maxRetries: 12,
+              timeout: 20 * 1000,
             });
             // const message = await fetch(
             //   `https://api.anthropic.com/v1/complete`,
@@ -415,13 +417,17 @@ export const useChatStore = create<ChatStore>()(
             // anthropic-version:2023-06-01 \
             // content-type:application/json \
             // x-api-key:'$ANTHROPIC_API_KEY'
-            const message = await anthropic.completions.create({
-              model: "claude-1",
-              max_tokens_to_sample: 300,
-              prompt: `${HUMAN_PROMPT}${
-                sendMessages[sendMessages.length - 1].content
-              }${AI_PROMPT}`,
-            });
+            const message = await anthropic.completions.create(
+              {
+                model: "claude-1",
+                max_tokens_to_sample: 300,
+                prompt: `${HUMAN_PROMPT}${
+                  sendMessages[sendMessages.length - 1].content
+                }${AI_PROMPT}`,
+                stream: false,
+              },
+              { timeout: 20 * 1000 },
+            );
             if (message) {
               botMessage.content = message.completion;
               if (voice) {
