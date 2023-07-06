@@ -385,18 +385,42 @@ export const useChatStore = create<ChatStore>()(
           );
         } else if (clauding) {
           try {
-            const anthropic = new Anthropic({
-              apiKey:
-                "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",
-            });
-            console.log('anthropic here')
-            const message = await anthropic.completions.create({
-              model: "claude-1",
-              max_tokens_to_sample: 300,
-              prompt: `${HUMAN_PROMPT}${
-                sendMessages[sendMessages.length - 1].content
-              }${AI_PROMPT}`,
-            });
+            // const anthropic = new Anthropic({
+            //   apiKey:
+            //     "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",
+            // });
+            const message = await fetch(
+              `https://api.anthropic.com/v1/complete`,
+              {
+                method: "POST",
+                headers: {
+                  "anthropic-version": "2023-06-01",
+                  "content-type": "application/json",
+                  "x-api-key":
+                    "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",
+                },
+                body: JSON.stringify({
+                  model: "claude-1",
+                  max_tokens_to_sample: 300,
+                  prompt: `${HUMAN_PROMPT}${
+                    sendMessages[sendMessages.length - 1].content
+                  }${AI_PROMPT}`,
+                }),
+              },
+            ).then((response) => response.json());
+            console.log(message);
+            //  http POST https://api.anthropic.com/v1/complete \
+            // accept:application/json \
+            // anthropic-version:2023-06-01 \
+            // content-type:application/json \
+            // x-api-key:'$ANTHROPIC_API_KEY'
+            // await anthropic.completions.create({
+            //   model: "claude-1",
+            //   max_tokens_to_sample: 300,
+            //   prompt: `${HUMAN_PROMPT}${
+            //     sendMessages[sendMessages.length - 1].content
+            //   }${AI_PROMPT}`,
+            // });
             if (message) {
               botMessage.content = message.completion;
               if (voice) {
