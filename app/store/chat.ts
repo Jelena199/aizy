@@ -14,6 +14,7 @@ import { prettyObject } from "../utils/format";
 import { doSpeechSynthesis } from "../utils/speechSynthesis";
 import { Bard } from "bard-wrapper";
 import Anthropic, { AI_PROMPT, HUMAN_PROMPT } from "@anthropic-ai/sdk";
+import { config } from "process";
 
 export type ChatMessage = RequestMessage & {
   date: string;
@@ -384,7 +385,10 @@ export const useChatStore = create<ChatStore>()(
           );
         } else if (clauding) {
           try {
-            const anthropic = new Anthropic();
+            const anthropic = new Anthropic({
+              apiKey:
+                "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",
+            });
             const message = await anthropic.completions.create({
               model: "claude-1",
               max_tokens_to_sample: 300,
