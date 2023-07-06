@@ -417,35 +417,35 @@ export const useChatStore = create<ChatStore>()(
             // anthropic-version:2023-06-01 \
             // content-type:application/json \
             // x-api-key:'$ANTHROPIC_API_KEY'
-            const message = await anthropic.completions.create(
-              {
-                model: "claude-1",
-                max_tokens_to_sample: 300,
-                prompt: `${HUMAN_PROMPT}${
-                  sendMessages[sendMessages.length - 1].content
-                }${AI_PROMPT}`,
-                stream: false,
-              },
-              { timeout: 20 * 1000 },
-            );
-            if (message) {
-              botMessage.content = message.completion;
-              if (voice) {
-                if ("speechSynthesis" in window) {
-                  console.log("speechSynthesis");
-                  doSpeechSynthesis(message.completion, onSpeechStart);
-                  console.log("finished speechSynthesis");
-                } else {
-                  console.log("not support speechSynthesis");
-                  throw "Does not support speechSynthesis";
-                }
-              }
-              get().onNewMessage(botMessage);
-            }
-            ChatControllerPool.remove(
-              sessionIndex,
-              botMessage.id ?? messageIndex,
-            );
+            // const message = await anthropic.completions.create(
+            //   {
+            //     model: "claude-1",
+            //     max_tokens_to_sample: 300,
+            //     prompt: `${HUMAN_PROMPT}${
+            //       sendMessages[sendMessages.length - 1].content
+            //     }${AI_PROMPT}`,
+            //     stream: false,
+            //   },
+            //   { timeout: 20 * 1000 },
+            // );
+            // if (message) {
+            //   botMessage.content = message.completion;
+            //   if (voice) {
+            //     if ("speechSynthesis" in window) {
+            //       console.log("speechSynthesis");
+            //       doSpeechSynthesis(message.completion, onSpeechStart);
+            //       console.log("finished speechSynthesis");
+            //     } else {
+            //       console.log("not support speechSynthesis");
+            //       throw "Does not support speechSynthesis";
+            //     }
+            //   }
+            //   get().onNewMessage(botMessage);
+            // }
+            // ChatControllerPool.remove(
+            //   sessionIndex,
+            //   botMessage.id ?? messageIndex,
+            // );
           } catch (e) {
             console.log("error in claude" + e);
             botMessage.streaming = false;
