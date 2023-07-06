@@ -389,6 +389,7 @@ export const useChatStore = create<ChatStore>()(
               apiKey:
                 "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",
             });
+            console.log('anthropic here')
             const message = await anthropic.completions.create({
               model: "claude-1",
               max_tokens_to_sample: 300,
