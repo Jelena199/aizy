@@ -411,6 +411,7 @@ export const useChatStore = create<ChatStore>()(
               botMessage.id ?? messageIndex,
             );
           } catch (e) {
+            console.log("error in claude" + e);
             botMessage.streaming = false;
             botMessage.content = "Something went wrong...";
             if (voice) {
