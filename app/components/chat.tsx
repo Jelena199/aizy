@@ -35,6 +35,8 @@ import ChineseIcon from "../icons/chinese.svg";
 import EnglishIcon from "../icons/english.svg";
 import PlayerIcon from "../icons/player-play.svg";
 import PlayerStopIcon from "../icons/player-stop.svg";
+import ClaudeIcon from "../icons/anthropic.svg";
+import ClaudeOffIcon from "../icons/anthropic-disable.svg";
 
 import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
@@ -332,11 +334,13 @@ export function ChatActions(props: {
   showPromptHints: () => void;
   onSpeechStart: () => void;
   onBarding: () => void;
+  onClauding: () => void;
   onChinese: () => void;
   setSpeaking: (param: boolean) => void;
   hitBottom: boolean;
   recording: boolean;
   barding: boolean;
+  clauding: boolean;
   chinese: boolean;
   speaking: boolean;
 }) {
@@ -468,6 +472,13 @@ export function ChatActions(props: {
 
       <div
         className={`${chatStyle["chat-input-action"]} clickable`}
+        onClick={props.onClauding}
+      >
+        {props.clauding ? <ClaudeIcon className="w-16" /> : <ClaudeOffIcon />}
+      </div>
+
+      <div
+        className={`${chatStyle["chat-input-action"]} clickable`}
         onClick={props.onChinese}
       >
         {props.chinese ? <ChineseIcon /> : <EnglishIcon />}
@@ -571,7 +582,7 @@ export function Chat() {
     if (userInput.trim() === "") return;
     setIsLoading(true);
     chatStore
-      .onUserInput(userInput, voiceMode, barding, onSpeechStart)
+      .onUserInput(userInput, voiceMode, barding, clauding, onSpeechStart)
       .then(() => {
         setIsLoading(false);
         if (speechRecognition) {
@@ -650,6 +661,7 @@ export function Chat() {
 
   const [recording, setRecording] = useState(false);
   const [barding, setBarding] = useState(false);
+  const [clauding, setClauding] = useState(false);
   const [chinese, setChinese] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
@@ -789,7 +801,7 @@ export function Chat() {
     const content = session.messages[userIndex].content;
     deleteMessage(userIndex);
     chatStore
-      .onUserInput(content, false, barding, onSpeechStart)
+      .onUserInput(content, false, barding, clauding, onSpeechStart)
       .then(() => setIsLoading(false));
     inputRef.current?.focus();
   };
@@ -1047,6 +1059,7 @@ export function Chat() {
           hitBottom={hitBottom}
           recording={recording}
           barding={barding}
+          clauding={clauding}
           chinese={chinese}
           speaking={speaking}
           showPromptHints={() => {
@@ -1061,8 +1074,15 @@ export function Chat() {
             onSearch("");
           }}
           onSpeechStart={onSpeechStart}
-          onBarding={() => setBarding(!barding)}
+          onBarding={() => {
+            setClauding(false);
+            setBarding(!barding);
+          }}
           onChinese={() => setChinese(!chinese)}
+          onClauding={() => {
+            setClauding(!clauding);
+            setBarding(false);
+          }}
           setSpeaking={setSpeaking}
         />
         <div className={styles["chat-input-panel-inner"]}>

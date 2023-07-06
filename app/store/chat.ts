@@ -13,6 +13,7 @@ import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
 import { doSpeechSynthesis } from "../utils/speechSynthesis";
 import { Bard } from "bard-wrapper";
+import Anthropic, { AI_PROMPT, HUMAN_PROMPT } from "@anthropic-ai/sdk";
 
 export type ChatMessage = RequestMessage & {
   date: string;
@@ -91,6 +92,7 @@ interface ChatStore {
     content: string,
     voice: boolean,
     barding: boolean,
+    clauding: boolean,
     onSpeechStart: () => Promise<void>,
   ) => Promise<void>;
   summarizeSession: () => void;
@@ -239,7 +241,7 @@ export const useChatStore = create<ChatStore>()(
         get().summarizeSession();
       },
 
-      async onUserInput(content, voice, barding, onSpeechStart) {
+      async onUserInput(content, voice, barding, clauding, onSpeechStart) {
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
 
@@ -380,6 +382,53 @@ export const useChatStore = create<ChatStore>()(
             sessionIndex,
             botMessage.id ?? messageIndex,
           );
+        } else if (clauding) {
+          try {
+            const anthropic = new Anthropic();
+            const message = await anthropic.completions.create({
+              model: "claude-1",
+              max_tokens_to_sample: 300,
+              prompt: `${HUMAN_PROMPT}${
+                sendMessages[sendMessages.length - 1].content
+              }${AI_PROMPT}`,
+            });
+            if (message) {
+              botMessage.content = message.completion;
+              if (voice) {
+                if ("speechSynthesis" in window) {
+                  console.log("speechSynthesis");
+                  doSpeechSynthesis(message.completion, onSpeechStart);
+                  console.log("finished speechSynthesis");
+                } else {
+                  console.log("not support speechSynthesis");
+                  throw "Does not support speechSynthesis";
+                }
+              }
+              get().onNewMessage(botMessage);
+            }
+            ChatControllerPool.remove(
+              sessionIndex,
+              botMessage.id ?? messageIndex,
+            );
+          } catch (e) {
+            botMessage.streaming = false;
+            botMessage.content = "Something went wrong...";
+            if (voice) {
+              if ("speechSynthesis" in window) {
+                console.log("speechSynthesis");
+                doSpeechSynthesis("Something went wrong...", onSpeechStart);
+                console.log("finished speechSynthesis");
+              } else {
+                console.log("not support speechSynthesis");
+                throw "Does not support speechSynthesis";
+              }
+            }
+            get().onNewMessage(botMessage);
+            ChatControllerPool.remove(
+              sessionIndex,
+              botMessage.id ?? messageIndex,
+            );
+          }
         } else {
           api.llm.chat({
             messages: sendMessages,
