@@ -394,6 +394,7 @@ export const useChatStore = create<ChatStore>()(
               {
                 method: "POST",
                 headers: {
+                  accept: "application/json",
                   "anthropic-version": "2023-06-01",
                   "content-type": "application/json",
                   "x-api-key":
