@@ -384,31 +384,34 @@ export const useChatStore = create<ChatStore>()(
           );
         } else if (clauding) {
           try {
-            const message = await fetch(`https://api.anthropic.com/v1/complete`, {
-              method: "POST",
-              headers: {
-                //@ts-ignore
-                Accept: "application/json",
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json",
-                "x-api-key":
-                  "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",
-                "sec-fetch-site": "same-site",
-                "sec-fetch-mode": "cors",
-                "sec-fetch-dest": "empty",
-                "sec-ch-ua-platform": "Windows",
-                "sec-ch-ua-mobile": "?0",
-                referer: "https://api.anthropic.com/",
-                origin: "https://api.anthropic.com/",
+            const message = await fetch(
+              `https://api.anthropic.com/v1/complete`,
+              {
+                method: "POST",
+                headers: {
+                  //@ts-ignore
+                  Accept: "application/json",
+                  "anthropic-version": "2023-06-01",
+                  "content-type": "application/json",
+                  "x-api-key":
+                    "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",
+                  "sec-fetch-site": "same-site",
+                  "sec-fetch-mode": "cors",
+                  "sec-fetch-dest": "empty",
+                  "sec-ch-ua-platform": "Windows",
+                  "sec-ch-ua-mobile": "?0",
+                  referer: "https://api.anthropic.com/",
+                  origin: "https://api.anthropic.com/",
+                },
+                body: JSON.stringify({
+                  model: "claude-1",
+                  max_tokens_to_sample: 300,
+                  prompt: `\n\nHuman: ${
+                    sendMessages[sendMessages.length - 1].content
+                  }\n\nAssistant:`,
+                }),
               },
-              body: JSON.stringify({
-                model: "claude-1",
-                max_tokens_to_sample: 300,
-                prompt: `\n\nHuman: ${
-                  sendMessages[sendMessages.length - 1].content
-                }\n\nAssistant:`,
-              }),
-            });
+            );
             if (message) {
               if (voice) {
                 if ("speechSynthesis" in window) {
@@ -426,8 +429,7 @@ export const useChatStore = create<ChatStore>()(
               sessionIndex,
               botMessage.id ?? messageIndex,
             );
-          }
-          catch (e) {
+          } catch (e) {
             botMessage.streaming = false;
             botMessage.content = "Something went wrong...";
             if (voice) {
