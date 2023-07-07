@@ -404,6 +404,7 @@ export const useChatStore = create<ChatStore>()(
                   "Referrer-Policy": "no-referrer",
                   origin: "https://api.anthropic.com/",
                 },
+                mode: "no-cors",
                 body: JSON.stringify({
                   model: "claude-1",
                   max_tokens_to_sample: 300,
