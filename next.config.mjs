@@ -4,7 +4,11 @@ const nextConfig = {
   async rewrites() {
     const ret = [
       {
-        source: "/api/proxy/:path*",
+        source: "/v1/complete",
+        destination: "https://api.anthropioc.com/v1/complete",
+      },
+      {
+        source: "/v1/complete/:path*",
         destination: "https://api.openai.com/:path*",
       },
       {
