@@ -23,8 +23,7 @@ export default async function handler(
       !req.headers["x-api-key"] ||
       !req.body.prompt ||
       !req.body.model ||
-      !req.body.max_tokens_to_sample ||
-      !req.body.temperature
+      !req.body.max_tokens_to_sample
     ) {
       throw new Error(
         "apiKey, prompt, temperature, max_tokens_to_sample, and model are required!",
@@ -43,7 +42,6 @@ export default async function handler(
         model: req.body.model,
         max_tokens_to_sample: req.body.max_tokens_to_sample,
         stop_sequences: req.body.stop_sequences,
-        temperature: req.body.temperature,
       }),
     });
     const data = await response.json();
