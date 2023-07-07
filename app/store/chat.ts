@@ -13,7 +13,7 @@ import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
 import { doSpeechSynthesis } from "../utils/speechSynthesis";
 import { Bard } from "bard-wrapper";
-import Anthropic, {
+import {
   AI_PROMPT,
   HUMAN_PROMPT,
   Client,
@@ -395,7 +395,7 @@ export const useChatStore = create<ChatStore>()(
             );
             botMessage.content = (
               await anthropic.complete({
-                prompt: `${Anthropic.HUMAN_PROMPT} how does a court case get to the Supreme Court? ${Anthropic.AI_PROMPT}`,
+                prompt: `${HUMAN_PROMPT} how does a court case get to the Supreme Court? ${AI_PROMPT}`,
                 max_tokens_to_sample: 300,
                 model: "claude-1",
               } as SamplingParameters)
