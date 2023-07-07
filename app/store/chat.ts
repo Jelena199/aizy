@@ -384,58 +384,54 @@ export const useChatStore = create<ChatStore>()(
             botMessage.id ?? messageIndex,
           );
         } else if (clauding) {
-          try {
-            const anthropic = new Anthropic({
-              apiKey:
-                "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",
-              maxRetries: 12,
-              timeout: 20 * 1000,
-            });
-            const message = await anthropic.completions
-              .create(
-                {
-                  model: "claude-1",
-                  max_tokens_to_sample: 300,
-                  prompt: `${HUMAN_PROMPT}${
-                    sendMessages[sendMessages.length - 1].content
-                  }${AI_PROMPT}`,
-                  stream: false,
-                },
-                { timeout: 20 * 1000 },
-              )
-              .catch((err) => {
-                if (err instanceof Anthropic.APIError) {
-                  console.log(err.status); // 400
-                  console.log(err.name); // BadRequestError
-                  console.log(err.headers); // {server: 'nginx', ...}
+          const anthropic = new Anthropic({
+            apiKey:
+              "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",
+            timeout: 5 * 1000,
+          });
+          const message = await anthropic.completions
+            .create(
+              {
+                model: "claude-1.3",
+                max_tokens_to_sample: 300,
+                prompt: `${HUMAN_PROMPT}${
+                  sendMessages[sendMessages.length - 1].content
+                }${AI_PROMPT}`,
+                stream: false,
+              },
+              { timeout: 5 * 1000 },
+            )
+            .catch((err) => {
+              if (err instanceof Anthropic.APIError) {
+                console.log(err.status); // 400
+                console.log(err.name); // BadRequestError
+                console.log(err.headers); // {server: 'nginx', ...}
+                console.log("error in claude" + err);
+                botMessage.streaming = false;
+                botMessage.content = "Something went wrong...";
+                if (voice) {
+                  if ("speechSynthesis" in window) {
+                    console.log("speechSynthesis");
+                    doSpeechSynthesis("Something went wrong...", onSpeechStart);
+                    console.log("finished speechSynthesis");
+                  } else {
+                    console.log("not support speechSynthesis");
+                    throw "Does not support speechSynthesis";
+                  }
                 }
-              });
-            if (message) {
-              botMessage.content = message.completion;
-              if (voice) {
-                if ("speechSynthesis" in window) {
-                  console.log("speechSynthesis");
-                  doSpeechSynthesis(message.completion, onSpeechStart);
-                  console.log("finished speechSynthesis");
-                } else {
-                  console.log("not support speechSynthesis");
-                  throw "Does not support speechSynthesis";
-                }
+                get().onNewMessage(botMessage);
+                ChatControllerPool.remove(
+                  sessionIndex,
+                  botMessage.id ?? messageIndex,
+                );
               }
-              get().onNewMessage(botMessage);
-            }
-            ChatControllerPool.remove(
-              sessionIndex,
-              botMessage.id ?? messageIndex,
-            );
-          } catch (e) {
-            console.log("error in claude" + e);
-            botMessage.streaming = false;
-            botMessage.content = "Something went wrong...";
+            });
+          if (message) {
+            botMessage.content = message.completion;
             if (voice) {
               if ("speechSynthesis" in window) {
                 console.log("speechSynthesis");
-                doSpeechSynthesis("Something went wrong...", onSpeechStart);
+                doSpeechSynthesis(message.completion, onSpeechStart);
                 console.log("finished speechSynthesis");
               } else {
                 console.log("not support speechSynthesis");
@@ -443,11 +439,11 @@ export const useChatStore = create<ChatStore>()(
               }
             }
             get().onNewMessage(botMessage);
-            ChatControllerPool.remove(
-              sessionIndex,
-              botMessage.id ?? messageIndex,
-            );
           }
+          ChatControllerPool.remove(
+            sessionIndex,
+            botMessage.id ?? messageIndex,
+          );
         } else {
           api.llm.chat({
             messages: sendMessages,
