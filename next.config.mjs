@@ -4,10 +4,6 @@ const nextConfig = {
   async rewrites() {
     const ret = [
       {
-        source: "/v1/complete",
-        destination: "https://api.anthropic.com/v1/complete",
-      },
-      {
         source: "/v1/complete/:path*",
         destination: "https://api.openai.com/:path*",
       },

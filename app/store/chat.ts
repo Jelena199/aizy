@@ -395,7 +395,7 @@ export const useChatStore = create<ChatStore>()(
             );
             botMessage.content = (
               await anthropic.complete({
-                prompt: `${HUMAN_PROMPT} how does a court case get to the Supreme Court? ${AI_PROMPT}`,
+                prompt: `Human: how does a court case get to the Supreme Court? ${AI_PROMPT}`,
                 max_tokens_to_sample: 300,
                 model: "claude-1",
               } as SamplingParameters)
