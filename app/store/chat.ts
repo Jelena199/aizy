@@ -13,7 +13,12 @@ import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
 import { doSpeechSynthesis } from "../utils/speechSynthesis";
 import { Bard } from "bard-wrapper";
-import Anthropic, { AI_PROMPT, HUMAN_PROMPT } from "@anthropic-ai/sdk";
+import Anthropic, {
+  AI_PROMPT,
+  HUMAN_PROMPT,
+  Client,
+  SamplingParameters,
+} from "@anthropic-ai/sdk";
 import { config } from "process";
 
 export type ChatMessage = RequestMessage & {
@@ -384,25 +389,20 @@ export const useChatStore = create<ChatStore>()(
             botMessage.id ?? messageIndex,
           );
         } else if (clauding) {
-          const anthropic = new Anthropic({
-            apiKey:
-              "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", // defaults to process.env["ANTHROPIC_API_KEY"]
-          });
           async function main() {
-            const params: Anthropic.CompletionCreateParams = {
-              prompt: `${Anthropic.HUMAN_PROMPT} how does a court case get to the Supreme Court? ${Anthropic.AI_PROMPT}`,
-              max_tokens_to_sample: 300,
-              model: "claude-1",
-            };
+            const anthropic = new Client(
+              "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",
+            );
             botMessage.content = (
-              await anthropic.completions.create(params)
+              await anthropic.complete({
+                prompt: `${Anthropic.HUMAN_PROMPT} how does a court case get to the Supreme Court? ${Anthropic.AI_PROMPT}`,
+                max_tokens_to_sample: 300,
+                model: "claude-1",
+              } as SamplingParameters)
             ).completion;
           }
           const message = main().catch((err) => {
-            if (err instanceof Anthropic.APIError) {
-              console.log(err.status); // 400
-              console.log(err.name); // BadRequestError
-              console.log(err.headers); // {server: 'nginx', ...}
+            if (err) {
               console.log("error in claude" + err);
               botMessage.streaming = false;
               botMessage.content = "Something went wrong...";
