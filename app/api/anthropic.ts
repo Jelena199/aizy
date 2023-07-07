@@ -15,6 +15,7 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   await cors(req, res);
+  console.log("m1");
   try {
     if (!req.body) {
       throw new Error("Invalid Body");
@@ -30,6 +31,7 @@ export default async function handler(
       );
     }
 
+    console.log("m2");
     const response = await fetch("https://api.anthropic.com/v1/complete", {
       method: "POST",
       headers: {
@@ -45,6 +47,7 @@ export default async function handler(
       }),
     });
     const data = await response.json();
+    console.log("m3");
     res.json({
       success: true,
       data,
