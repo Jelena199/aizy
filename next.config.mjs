@@ -5,7 +5,7 @@ const nextConfig = {
     const ret = [
       {
         source: "/v1/complete",
-        destination: "https://api.anthropioc.com/v1/complete",
+        destination: "https://api.anthropic.com/v1/complete",
       },
       {
         source: "/v1/complete/:path*",
