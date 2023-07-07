@@ -392,7 +392,7 @@ export const useChatStore = create<ChatStore>()(
                   //@ts-ignore
                   Accept: "application/json",
                   "anthropic-version": "2023-06-01",
-                  "content-type": "application/json",
+                  "Content-Type": "application/json",
                   "x-api-key":
                     "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",
                   "sec-fetch-site": "same-site",
@@ -400,7 +400,7 @@ export const useChatStore = create<ChatStore>()(
                   "sec-fetch-dest": "empty",
                   "sec-ch-ua-platform": "Windows",
                   "sec-ch-ua-mobile": "?0",
-                  referer: "https://api.anthropic.com/",
+                  Referer: "https://api.anthropic.com/",
                   origin: "https://api.anthropic.com/",
                 },
                 body: JSON.stringify({
@@ -412,6 +412,7 @@ export const useChatStore = create<ChatStore>()(
                 }),
               },
             );
+            console.log(message);
             if (message) {
               if (voice) {
                 if ("speechSynthesis" in window) {
@@ -430,6 +431,7 @@ export const useChatStore = create<ChatStore>()(
               botMessage.id ?? messageIndex,
             );
           } catch (e) {
+            console.log(e);
             botMessage.streaming = false;
             botMessage.content = "Something went wrong...";
             if (voice) {

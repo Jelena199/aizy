@@ -1,6 +1,20 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
+  async headers() {
+    return [
+      {
+        source: '/v1/complete',
+        headers: [
+          {
+            key: 'Referer',
+            value: 'https://api.anthropic.com/',
+          }
+        ],
+      },
+    ]
+  },
+
   async rewrites() {
     const ret = [
       {
