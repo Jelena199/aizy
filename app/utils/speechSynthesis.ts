@@ -20,14 +20,17 @@ function internalSpeechSynthesis(
   endHandler: () => void,
 ) {
   // Read each piece of text sequentially
-  function speakTextParts(index = 0) {
+  function speakTextParts(index = 0, lang = "en-US") {
     if (index < utterances.length) {
       const textToHighlight = textParts[index];
       const highlightIndex = longText.indexOf(textToHighlight);
 
-      utterances[index].lang = /[^\x00-\x7f]/.test(utterances[index].text) ? "zh-CN" : "en-US";
+      utterances[index].lang = lang;
       // Speak the text
       speechSynthesis.speak(utterances[index]);
+      utterances[index].voice = speechSynthesis
+        .getVoices()
+        .find((voice) => voice.lang === lang) as SpeechSynthesisVoice;
       utterances[index].addEventListener("end", () => {
         // Remove the highlight
         speakTextParts(index + 1);
@@ -40,7 +43,8 @@ function internalSpeechSynthesis(
   }
 
   // Begin speak
-  speakTextParts();
+  const lang = /[^\x00-\x7f]/.test(utterances[0].text) ? "zh-CN" : "en-US";
+  speakTextParts(0, lang);
 }
 
 export function doSpeechSynthesis(
