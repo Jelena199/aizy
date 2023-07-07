@@ -395,14 +395,6 @@ export const useChatStore = create<ChatStore>()(
                   "Content-Type": "application/json",
                   "x-api-key":
                     "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",
-                  "sec-fetch-site": "same-site",
-                  "sec-fetch-mode": "cors",
-                  "sec-fetch-dest": "empty",
-                  "sec-ch-ua-platform": "Windows",
-                  "sec-ch-ua-mobile": "?0",
-                  Referer: "http://127.0.0.1/",
-                  "Referrer-Policy": "no-referrer",
-                  origin: "https://api.anthropic.com/",
                 },
                 mode: "no-cors",
                 body: JSON.stringify({
