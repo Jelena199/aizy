@@ -20,17 +20,19 @@ function internalSpeechSynthesis(
   endHandler: () => void,
 ) {
   // Read each piece of text sequentially
-  function speakTextParts(index = 0) {
+  function speakTextParts(index = 0, lang = "en-US", voice: any) {
     if (index < utterances.length) {
       const textToHighlight = textParts[index];
       const highlightIndex = longText.indexOf(textToHighlight);
 
-      utterances[index].lang = /[^\x00-\x7f]/.test(utterances[index].text) ? "zh-CN" : "en-US";
+      utterances[index].lang = lang;
       // Speak the text
       speechSynthesis.speak(utterances[index]);
+      console.log(utterances[index].text);
+      utterances[index].voice = voice;
       utterances[index].addEventListener("end", () => {
         // Remove the highlight
-        speakTextParts(index + 1);
+        speakTextParts(index + 1, lang, voice);
       });
 
       // Remove the highlight if speech synthesis is interrupted
@@ -40,7 +42,11 @@ function internalSpeechSynthesis(
   }
 
   // Begin speak
-  speakTextParts();
+  const lang = /[^\x00-\x7f]/.test(utterances[0].text) ? "zh-CN" : "en-US";
+  const voice = speechSynthesis
+    .getVoices()
+    .find((voice) => voice.lang === lang) as SpeechSynthesisVoice;
+  speakTextParts(0, lang, voice);
 }
 
 export function doSpeechSynthesis(
@@ -49,20 +55,23 @@ export function doSpeechSynthesis(
 ) {
   longText = cleanStringToSynthesis(longText);
 
-  const maxLength = 100;
-  const punctuationIndices = Array.from(longText.matchAll(/[,.?!]/g)).map(
+  const maxLength = 20;
+  const punctuationIndices = Array.from(longText.matchAll(/[,.?!、。]/g)).map(
     (match) => match.index || -1,
   );
 
   const textParts: Array<string> = [];
   let startIndex = 0;
+  console.log(punctuationIndices);
   for (let i = 0; i < punctuationIndices.length; i++) {
+    console.log("1");
     if (
       punctuationIndices[i] &&
       punctuationIndices[i]! - startIndex < maxLength
     ) {
       continue;
     }
+    console.log(punctuationIndices[i] + 1);
     textParts.push(longText.substring(startIndex, punctuationIndices[i] + 1));
     startIndex = punctuationIndices[i] + 1;
   }

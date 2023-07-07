@@ -1,12 +1,26 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
+  async headers() {
+    return [
+      {
+        source: '/v1/complete',
+        headers: [
+          {
+            key: 'Referer',
+            value: 'http://127.0.0.1/',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'no-referrer'
+          }
+        ],
+      },
+    ]
+  },
+
   async rewrites() {
     const ret = [
-      {
-        source: "/v1/complete",
-        destination: "https://api.anthropic.com/v1/complete",
-      },
       {
         source: "/v1/complete/:path*",
         destination: "https://api.openai.com/:path*",

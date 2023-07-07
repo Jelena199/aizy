@@ -13,12 +13,6 @@ import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
 import { doSpeechSynthesis } from "../utils/speechSynthesis";
 import { Bard } from "bard-wrapper";
-import {
-  AI_PROMPT,
-  HUMAN_PROMPT,
-  Client,
-  SamplingParameters,
-} from "@anthropic-ai/sdk";
 import { config } from "process";
 
 export type ChatMessage = RequestMessage & {
@@ -389,27 +383,34 @@ export const useChatStore = create<ChatStore>()(
             botMessage.id ?? messageIndex,
           );
         } else if (clauding) {
-          async function main() {
-            const anthropic = new Client(
-              "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",
+          try {
+            const message = await fetch(
+              `https://chat.dogai.com/api/anthropic`,
+              {
+                method: "POST",
+                headers: {
+                  //@ts-ignore
+                  Accept: "application/json",
+                  "anthropic-version": "2023-06-01",
+                  "content-type": "application/x-www-form-urlencoded",
+                  "x-api-key":
+                    "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",
+                },
+                body: JSON.stringify({
+                  model: "claude-1",
+                  max_tokens_to_sample: 256,
+                  prompt: `Human: ${
+                    sendMessages[sendMessages.length - 1].content
+                  }\n\nAssistant:`,
+                }),
+              },
             );
-            botMessage.content = (
-              await anthropic.complete({
-                prompt: `${HUMAN_PROMPT} how does a court case get to the Supreme Court? ${AI_PROMPT}`,
-                max_tokens_to_sample: 300,
-                model: "claude-1",
-              } as SamplingParameters)
-            ).completion;
-          }
-          const message = main().catch((err) => {
-            if (err) {
-              console.log("error in claude" + err);
-              botMessage.streaming = false;
-              botMessage.content = "Something went wrong...";
+            console.log(message);
+            if (message) {
               if (voice) {
                 if ("speechSynthesis" in window) {
                   console.log("speechSynthesis");
-                  doSpeechSynthesis("Something went wrong...", onSpeechStart);
+                  doSpeechSynthesis(botMessage.content, onSpeechStart);
                   console.log("finished speechSynthesis");
                 } else {
                   console.log("not support speechSynthesis");
@@ -417,17 +418,19 @@ export const useChatStore = create<ChatStore>()(
                 }
               }
               get().onNewMessage(botMessage);
-              ChatControllerPool.remove(
-                sessionIndex,
-                botMessage.id ?? messageIndex,
-              );
             }
-          });
-          if (botMessage.content) {
+            ChatControllerPool.remove(
+              sessionIndex,
+              botMessage.id ?? messageIndex,
+            );
+          } catch (e) {
+            console.log(e);
+            botMessage.streaming = false;
+            botMessage.content = "Something went wrong...";
             if (voice) {
               if ("speechSynthesis" in window) {
                 console.log("speechSynthesis");
-                doSpeechSynthesis(botMessage.content, onSpeechStart);
+                doSpeechSynthesis("Something went wrong...", onSpeechStart);
                 console.log("finished speechSynthesis");
               } else {
                 console.log("not support speechSynthesis");
@@ -436,10 +439,6 @@ export const useChatStore = create<ChatStore>()(
             }
             get().onNewMessage(botMessage);
           }
-          ChatControllerPool.remove(
-            sessionIndex,
-            botMessage.id ?? messageIndex,
-          );
         } else {
           api.llm.chat({
             messages: sendMessages,
