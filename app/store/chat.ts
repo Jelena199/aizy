@@ -389,12 +389,13 @@ export const useChatStore = create<ChatStore>()(
               "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",
             timeout: 5 * 1000,
           });
+
           const message = await anthropic.completions
             .create(
               {
-                model: "claude-1.3",
+                model: "claude-1",
                 max_tokens_to_sample: 300,
-                prompt: `${HUMAN_PROMPT}${
+                prompt: `Human: ${
                   sendMessages[sendMessages.length - 1].content
                 }${AI_PROMPT}`,
                 stream: false,
