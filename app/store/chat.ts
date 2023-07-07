@@ -391,61 +391,43 @@ export const useChatStore = create<ChatStore>()(
               maxRetries: 12,
               timeout: 20 * 1000,
             });
-            // const message = await fetch(
-            //   `https://api.anthropic.com/v1/complete`,
-            //   {
-            //     method: "POST",
-            //     headers: {
-            //       accept: "application/json",
-            //       "anthropic-version": "2023-06-01",
-            //       "content-type": "application/json",
-            //       "x-api-key":
-            //         "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",
-            //     },
-            //     body: JSON.stringify({
-            //       model: "claude-1",
-            //       max_tokens_to_sample: 300,
-            //       prompt: `${HUMAN_PROMPT}${
-            //         sendMessages[sendMessages.length - 1].content
-            //       }${AI_PROMPT}`,
-            //     }),
-            //   },
-            // ).then((response) => response.json());
-            // console.log(message);
-            //  http POST https://api.anthropic.com/v1/complete \
-            // accept:application/json \
-            // anthropic-version:2023-06-01 \
-            // content-type:application/json \
-            // x-api-key:'$ANTHROPIC_API_KEY'
-            // const message = await anthropic.completions.create(
-            //   {
-            //     model: "claude-1",
-            //     max_tokens_to_sample: 300,
-            //     prompt: `${HUMAN_PROMPT}${
-            //       sendMessages[sendMessages.length - 1].content
-            //     }${AI_PROMPT}`,
-            //     stream: false,
-            //   },
-            //   { timeout: 20 * 1000 },
-            // );
-            // if (message) {
-            //   botMessage.content = message.completion;
-            //   if (voice) {
-            //     if ("speechSynthesis" in window) {
-            //       console.log("speechSynthesis");
-            //       doSpeechSynthesis(message.completion, onSpeechStart);
-            //       console.log("finished speechSynthesis");
-            //     } else {
-            //       console.log("not support speechSynthesis");
-            //       throw "Does not support speechSynthesis";
-            //     }
-            //   }
-            //   get().onNewMessage(botMessage);
-            // }
-            // ChatControllerPool.remove(
-            //   sessionIndex,
-            //   botMessage.id ?? messageIndex,
-            // );
+            const message = await anthropic.completions
+              .create(
+                {
+                  model: "claude-1",
+                  max_tokens_to_sample: 300,
+                  prompt: `${HUMAN_PROMPT}${
+                    sendMessages[sendMessages.length - 1].content
+                  }${AI_PROMPT}`,
+                  stream: false,
+                },
+                { timeout: 20 * 1000 },
+              )
+              .catch((err) => {
+                if (err instanceof Anthropic.APIError) {
+                  console.log(err.status); // 400
+                  console.log(err.name); // BadRequestError
+                  console.log(err.headers); // {server: 'nginx', ...}
+                }
+              });
+            if (message) {
+              botMessage.content = message.completion;
+              if (voice) {
+                if ("speechSynthesis" in window) {
+                  console.log("speechSynthesis");
+                  doSpeechSynthesis(message.completion, onSpeechStart);
+                  console.log("finished speechSynthesis");
+                } else {
+                  console.log("not support speechSynthesis");
+                  throw "Does not support speechSynthesis";
+                }
+              }
+              get().onNewMessage(botMessage);
+            }
+            ChatControllerPool.remove(
+              sessionIndex,
+              botMessage.id ?? messageIndex,
+            );
           } catch (e) {
             console.log("error in claude" + e);
             botMessage.streaming = false;
