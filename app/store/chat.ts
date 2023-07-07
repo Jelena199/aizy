@@ -384,24 +384,27 @@ export const useChatStore = create<ChatStore>()(
           );
         } else if (clauding) {
           try {
-            const message = await fetch(`http://91.189.132.242/api/anthropic`, {
-              method: "POST",
-              headers: {
-                //@ts-ignore
-                Accept: "application/json",
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/x-www-form-urlencoded",
-                "x-api-key":
-                  "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",
+            const message = await fetch(
+              `https://chat.dogai.com/api/anthropic`,
+              {
+                method: "POST",
+                headers: {
+                  //@ts-ignore
+                  Accept: "application/json",
+                  "anthropic-version": "2023-06-01",
+                  "content-type": "application/x-www-form-urlencoded",
+                  "x-api-key":
+                    "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",
+                },
+                body: JSON.stringify({
+                  model: "claude-1",
+                  max_tokens_to_sample: 256,
+                  prompt: `Human: ${
+                    sendMessages[sendMessages.length - 1].content
+                  }\n\nAssistant:`,
+                }),
               },
-              body: JSON.stringify({
-                model: "claude-1",
-                max_tokens_to_sample: 256,
-                prompt: `Human: ${
-                  sendMessages[sendMessages.length - 1].content
-                }\n\nAssistant:`,
-              }),
-            });
+            );
             console.log(message);
             if (message) {
               if (voice) {
