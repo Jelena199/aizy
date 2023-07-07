@@ -399,7 +399,7 @@ export const useChatStore = create<ChatStore>()(
                 mode: "no-cors",
                 body: JSON.stringify({
                   model: "claude-1",
-                  max_tokens_to_sample: 300,
+                  max_tokens_to_sample: 256,
                   prompt: `Human: ${
                     sendMessages[sendMessages.length - 1].content
                   }\n\nAssistant:`,
