@@ -13,6 +13,13 @@ import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
 import { doSpeechSynthesis } from "../utils/speechSynthesis";
 import { Bard } from "bard-wrapper";
+import {
+  AI_PROMPT,
+  HUMAN_PROMPT,
+  Client,
+  SamplingParameters,
+} from "@anthropic-ai/sdk";
+import { config } from "process";
 
 export type ChatMessage = RequestMessage & {
   date: string;
@@ -91,6 +98,7 @@ interface ChatStore {
     content: string,
     voice: boolean,
     barding: boolean,
+    clauding: boolean,
     onSpeechStart: () => Promise<void>,
   ) => Promise<void>;
   summarizeSession: () => void;
@@ -239,7 +247,7 @@ export const useChatStore = create<ChatStore>()(
         get().summarizeSession();
       },
 
-      async onUserInput(content, voice, barding, onSpeechStart) {
+      async onUserInput(content, voice, barding, clauding, onSpeechStart) {
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
 
@@ -368,6 +376,58 @@ export const useChatStore = create<ChatStore>()(
               if ("speechSynthesis" in window) {
                 console.log("speechSynthesis");
                 doSpeechSynthesis("Something went wrong...", onSpeechStart);
+                console.log("finished speechSynthesis");
+              } else {
+                console.log("not support speechSynthesis");
+                throw "Does not support speechSynthesis";
+              }
+            }
+            get().onNewMessage(botMessage);
+          }
+          ChatControllerPool.remove(
+            sessionIndex,
+            botMessage.id ?? messageIndex,
+          );
+        } else if (clauding) {
+          async function main() {
+            const anthropic = new Client(
+              "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",
+            );
+            botMessage.content = (
+              await anthropic.complete({
+                prompt: `${HUMAN_PROMPT} how does a court case get to the Supreme Court? ${AI_PROMPT}`,
+                max_tokens_to_sample: 300,
+                model: "claude-1",
+              } as SamplingParameters)
+            ).completion;
+          }
+          const message = main().catch((err) => {
+            if (err) {
+              console.log("error in claude" + err);
+              botMessage.streaming = false;
+              botMessage.content = "Something went wrong...";
+              if (voice) {
+                if ("speechSynthesis" in window) {
+                  console.log("speechSynthesis");
+                  doSpeechSynthesis("Something went wrong...", onSpeechStart);
+                  console.log("finished speechSynthesis");
+                } else {
+                  console.log("not support speechSynthesis");
+                  throw "Does not support speechSynthesis";
+                }
+              }
+              get().onNewMessage(botMessage);
+              ChatControllerPool.remove(
+                sessionIndex,
+                botMessage.id ?? messageIndex,
+              );
+            }
+          });
+          if (botMessage.content) {
+            if (voice) {
+              if ("speechSynthesis" in window) {
+                console.log("speechSynthesis");
+                doSpeechSynthesis(botMessage.content, onSpeechStart);
                 console.log("finished speechSynthesis");
               } else {
                 console.log("not support speechSynthesis");
