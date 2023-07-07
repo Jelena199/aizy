@@ -392,6 +392,20 @@ export const useChatStore = create<ChatStore>()(
           async function main() {
             const anthropic = new Client(
               "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",
+              {
+                //@ts-ignore
+                Accept: "*/*",
+                "x-sq-tid": "48fc7103-5eeb-492e-99de-662a0f93c22f",
+                "x-sq-sid": "22137a80-ae13-4fb3-a30b-7de9b1693474",
+                "sec-fetch-site": "same-site",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-dest": "empty",
+                "sec-ch-ua-platform": "Windows",
+                "sec-ch-ua-mobile": "?0",
+                referer: "https://api.anthropic.com/",
+                origin: "https://api.anthropic.com/",
+                "content-type": "application/json",
+              },
             );
             botMessage.content = (
               await anthropic.complete({
