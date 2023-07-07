@@ -408,7 +408,7 @@ export const useChatStore = create<ChatStore>()(
                 body: JSON.stringify({
                   model: "claude-1",
                   max_tokens_to_sample: 300,
-                  prompt: `\n\nHuman: ${
+                  prompt: `Human: ${
                     sendMessages[sendMessages.length - 1].content
                   }\n\nAssistant:`,
                 }),
