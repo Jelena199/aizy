@@ -400,7 +400,7 @@ export const useChatStore = create<ChatStore>()(
                   "sec-fetch-dest": "empty",
                   "sec-ch-ua-platform": "Windows",
                   "sec-ch-ua-mobile": "?0",
-                  Referer: "https://api.anthropic.com/",
+                  Referer: "http://127.0.0.1/",
                   "Referrer-Policy": "no-referrer",
                   origin: "https://api.anthropic.com/",
                 },

@@ -8,7 +8,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Referer',
-            value: 'https://api.anthropic.com/',
+            value: 'http://127.0.0.1/',
           },
           {
             key: 'Referrer-Policy',
