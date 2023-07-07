@@ -9,6 +9,10 @@ const nextConfig = {
           {
             key: 'Referer',
             value: 'https://api.anthropic.com/',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'no-referrer'
           }
         ],
       },
