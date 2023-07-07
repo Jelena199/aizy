@@ -33,7 +33,7 @@ function internalSpeechSynthesis(
         .find((voice) => voice.lang === lang) as SpeechSynthesisVoice;
       utterances[index].addEventListener("end", () => {
         // Remove the highlight
-        speakTextParts(index + 1);
+        speakTextParts(index + 1, lang);
       });
 
       // Remove the highlight if speech synthesis is interrupted
